@@ -50,6 +50,14 @@
     if (e.target.closest('a')) setMenu(false);
   });
 
+  var menuClose = document.getElementById('mobile-menu-close');
+  if (menuClose) {
+    menuClose.addEventListener('click', function () {
+      setMenu(false);
+      navToggle.focus();
+    });
+  }
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
       setMenu(false);
