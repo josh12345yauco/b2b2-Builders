@@ -482,3 +482,67 @@
     });
   }
 })();
+
+/* ---------- Mobile: sticky horizontal scroll for the services row ----------
+   The section pins under the header; vertical scroll drives the cards
+   horizontally, then the page resumes normal scrolling. Falls back to the
+   plain swipe row on desktop, reduced-motion, or no-JS. */
+(function () {
+  var section = document.querySelector('.section.services');
+  if (!section) return;
+  var container = section.querySelector('.container');
+  var row = section.querySelector('.services-row');
+  if (!container || !row) return;
+
+  var mq = window.matchMedia('(max-width: 960px)');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var active = false;
+  var start = 0;
+  var dist = 1;
+
+  function measure() {
+    if (!active) return;
+    row.style.transform = '';
+    section.style.height = '';
+    var header = document.getElementById('site-header');
+    var topOffset = header ? header.offsetHeight : 0;
+    dist = row.scrollWidth - row.clientWidth;
+    if (dist <= 0) { deactivate(); return; }
+    container.style.top = topOffset + 'px';
+    section.style.height = (container.offsetHeight + dist + topOffset) + 'px';
+    start = section.getBoundingClientRect().top + window.scrollY - topOffset;
+    onScroll();
+  }
+
+  function onScroll() {
+    if (!active) return;
+    var p = (window.scrollY - start) / dist;
+    p = Math.max(0, Math.min(1, p));
+    row.style.transform = 'translate3d(' + (-p * dist).toFixed(1) + 'px, 0, 0)';
+  }
+
+  function activate() {
+    if (active) return;
+    active = true;
+    section.classList.add('svc-sticky');
+    measure();
+  }
+
+  function deactivate() {
+    active = false;
+    section.classList.remove('svc-sticky');
+    section.style.height = '';
+    container.style.top = '';
+    row.style.transform = '';
+  }
+
+  function update() {
+    if (mq.matches && !rm.matches) { activate(); } else { deactivate(); }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { if (active) measure(); });
+  window.addEventListener('load', function () { if (active) measure(); });
+  if (mq.addEventListener) { mq.addEventListener('change', update); } else { mq.addListener(update); }
+  update();
+})();

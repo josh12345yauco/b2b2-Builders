@@ -385,11 +385,15 @@ h2 {
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:first-child {
-  transform: translateY(4px) rotate(45deg);
+  transform: translateY(8px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
 }
 
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:last-child {
-  transform: translateY(-4px) rotate(-45deg);
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* Full-screen mobile menu */
@@ -5016,5 +5020,27 @@ body.overlay-header .logo-main,
     align-items: flex-start;
     text-align: left;
     line-height: 1.45;
+  }
+}
+
+/* ==========================================================================
+   Mobile services row: sticky pin + scroll-driven horizontal travel.
+   .svc-sticky is added by JS; without it the swipe row remains.
+   ========================================================================== */
+@media (max-width: 960px) {
+  .services-row {
+    padding-inline: calc(var(--gutter) + 0.25rem);
+  }
+
+  .services.svc-sticky .container {
+    position: sticky;
+    /* top set by JS to clear the fixed/sticky header */
+  }
+
+  .services.svc-sticky .services-row {
+    overflow: visible;
+    scroll-snap-type: none;
+    padding-bottom: 0;
+    will-change: transform;
   }
 }
