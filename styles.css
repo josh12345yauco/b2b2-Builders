@@ -4973,12 +4973,25 @@ body.overlay-header .logo-main,
 }
 
 @media (max-width: 640px) {
-  .hero-v2-actions,
+  /* Interior heroes: long labels stack */
   .page-hero:not(.about-hero) .page-hero-actions {
     grid-auto-flow: row;
     grid-auto-columns: unset;
     width: 100%;
     max-width: 360px;
+  }
+
+  /* Homepage hero: keep the pair side by side, slightly compacted */
+  .hero-v2-actions {
+    width: 100%;
+    max-width: 380px;
+    gap: 0.75rem;
+  }
+
+  .hero-v2-actions .btn {
+    font-size: 0.875rem;
+    padding-inline: 0.6rem;
+    white-space: nowrap;
   }
 }
 
