@@ -1,0 +1,9 @@
+{
+  "name": "b2b2-builders-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "B2B2 Builders static site + zero-dependency leads backend",
+  "scripts": {
+    "start": "node server/server.js"
+  }
+}

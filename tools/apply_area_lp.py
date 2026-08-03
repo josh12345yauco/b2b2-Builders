@@ -28,7 +28,7 @@ AREAS = [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, with COIs ready before your association asks'),
             ("pin", '<strong>Ten minutes from our HQ</strong> — straight down Frankford Ave from 3146 Frankford'),
             ("doc", '<strong>Itemized free estimates</strong> — real numbers in writing, usually within 24 hours of the walkthrough'),
-            ("person", '<strong>Owner on every project</strong> — see the finish level at <a href="/projects/1745-waterloo-street/">our custom build on Waterloo Street</a>'),
+            ("person", '<strong>Owner on every project</strong> — see the finish level at <a href="/projects/luxury-townhome-kensington/">our custom build on Waterloo Street</a>'),
         ],
         "stats": [
             ("The townhome vintage we remodel most", "2000s"),
@@ -53,7 +53,7 @@ AREAS = [
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, Philadelphia L&amp;I permits pulled on every job'),
-            ("pin", '<strong>We build on these blocks</strong> — ground-up at <a href="/projects/1855-e-huntingdon-street/">1855 E Huntingdon Street</a>'),
+            ("pin", '<strong>We build on these blocks</strong> — ground-up at <a href="/projects/modern-custom-home-east-kensington/">Modern Custom Home</a>'),
             ("doc", '<strong>Itemized free estimates</strong> — shell rehabs priced with realistic allowances, not blank checks'),
             ("person", '<strong>Owner on every project</strong> — investor rehabs and family homes get the same site discipline'),
         ],
@@ -82,7 +82,7 @@ AREAS = [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, Philadelphia L&amp;I permits pulled on every job'),
             ("pin", '<strong>Our home ZIP</strong> — headquarters at 3146 Frankford Ave, minutes down the avenue'),
             ("doc", '<strong>Itemized free estimates</strong> — real numbers in writing, usually within 24 hours of the walkthrough'),
-            ("person", '<strong>We built five homes here</strong> — see <a href="/projects/3330-38-salmon-street/">3330-38 Salmon Street</a>'),
+            ("person", '<strong>We built five homes here</strong> — see <a href="/projects/new-construction-port-richmond/">Five New Construction Homes</a>'),
         ],
         "stats": [
             ("New homes we built on Salmon Street alone", "5"),
@@ -107,14 +107,14 @@ AREAS = [
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, with historic-review experience where blocks require it'),
-            ("pin", '<strong>We build here</strong> — our rehab with addition at <a href="/projects/766-s-front-street/">766 S Front Street</a> is two blocks off the Delaware'),
+            ("pin", '<strong>We build here</strong> — our rehab with addition at <a href="/projects/property-rehab-queen-village/">Property Rehab &amp; Addition</a> is two blocks off the Delaware'),
             ("doc", '<strong>Itemized free estimates</strong> — old-house allowances priced honestly, not discovered later'),
             ("person", '<strong>Owner on every project</strong> — 200-year-old structures get the patience they demand'),
         ],
         "stats": [
             ("Age of the neighborhood's oldest housing stock", "200+ yrs"),
             ("The ZIP we serve, river to Passyunk", "19147"),
-            ("S Front St — our rehab with a second-floor addition", "766"),
+            ("Blocks off the Delaware — our rehab with a second-floor addition", "2"),
             ("Jobs we'll run without an L&amp;I permit", "0"),
         ],
         "fact": "Fact worth knowing: parts of Queen Village sit under historic-district review, where exterior changes need commission approval before L&I issues permits. We confirm your block's status at the estimate stage — before design gets ahead of approvals.",
@@ -136,7 +136,7 @@ AREAS = [
             ("shield", '<strong>Licensed &amp; insured</strong> — COIs naming your association, ready before the management office asks'),
             ("pin", '<strong>Building paperwork handled</strong> — alteration agreements, elevator bookings, quiet-hours scheduling'),
             ("doc", '<strong>Itemized free estimates</strong> — real numbers in writing, usually within 24 hours of the walkthrough'),
-            ("person", '<strong>Premium finish level</strong> — the standard from <a href="/projects/1745-waterloo-street/">our custom build on Waterloo Street</a>, brought upstairs'),
+            ("person", '<strong>Premium finish level</strong> — the standard from <a href="/projects/luxury-townhome-kensington/">our custom build on Waterloo Street</a>, brought upstairs'),
         ],
         "stats": [
             ("Insurance certificates ready before your building asks", "COI"),
@@ -163,7 +163,7 @@ AREAS = [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, permitted through your borough or township'),
             ("pin", '<strong>Township permitting handled</strong> — Ambler borough, Whitpain, Whitemarsh, and neighbors'),
             ("doc", '<strong>Itemized free estimates</strong> — real numbers in writing, usually within 24 hours of the walkthrough'),
-            ("person", '<strong>Full-build proof</strong> — we ran <a href="/projects/3330-38-salmon-street/">five ground-up homes on one street</a> end to end'),
+            ("person", '<strong>Full-build proof</strong> — we ran <a href="/projects/new-construction-port-richmond/">five ground-up homes on one street</a> end to end'),
         ],
         "stats": [
             ("Boroughs &amp; townships we permit in most", "3+"),

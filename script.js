@@ -310,14 +310,13 @@
       source: 'project-builder'
     };
 
-    console.log('Project Builder payload:', JSON.stringify(payload, null, 2));
-
-    // TODO: POST payload to GHL webhook
-    // fetch('https://services.leadconnectorhq.com/hooks/XXXX/webhook-trigger/XXXX', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(payload)
-    // });
+    // Persist the lead to the site backend (shows in /admin)
+    fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(function () { /* backend offline — payload still tracked below */ });
 
     trackEvent({ event: 'project_builder_submit', payload: payload });
 
@@ -421,14 +420,13 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      console.log('Area lead payload:', JSON.stringify(payload, null, 2));
-
-      // TODO: POST payload to GHL webhook
-      // fetch('https://services.leadconnectorhq.com/hooks/XXXX/webhook-trigger/XXXX', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(payload)
-      // });
+      // Persist the lead to the site backend (shows in /admin)
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function () { /* backend offline — payload still tracked below */ });
 
       trackEvent({ event: 'area_lead_submit', payload: payload });
 
@@ -467,18 +465,17 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      console.log('Contact form payload:', JSON.stringify(payload, null, 2));
-
-      // TODO: POST payload to GHL webhook
-      // fetch('https://services.leadconnectorhq.com/hooks/XXXX/webhook-trigger/XXXX', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(payload)
-      // });
+      // Persist the lead to the site backend (shows in /admin)
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function () { /* backend offline — payload still tracked below */ });
 
       trackEvent({ event: 'contact_form_submit', payload: payload });
 
-      contactForm.querySelectorAll('.field, .builder-controls, button[type="submit"]').forEach(function (el) {
+      contactForm.querySelectorAll('.field, .field-row, .builder-controls, button[type="submit"]').forEach(function (el) {
         el.hidden = true;
       });
       var success = contactForm.querySelector('.form-success');

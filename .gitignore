@@ -1,2 +1,9 @@
 .DS_Store
 _*.html
+
+# leads backend runtime data (never commit leads)
+server/leads.json
+server/leads.json.tmp
+server/.session-secret
+node_modules/
+_source-photos/

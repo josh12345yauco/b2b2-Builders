@@ -2241,6 +2241,17 @@ html.js [data-reveal].revealed {
   aspect-ratio: 16 / 8;
 }
 
+/* Video tiles in project galleries — letterbox on dark instead of cropping,
+   so portrait walkthrough videos stay fully visible */
+.gallery-grid video {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  border-radius: 12px;
+  background: var(--ink);
+}
+
 /* ---------- Forms (contact page) ---------- */
 .field select,
 .field textarea {
