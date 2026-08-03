@@ -563,3 +563,30 @@
   if (mq.addEventListener) { mq.addEventListener('change', update); } else { mq.addListener(update); }
   update();
 })();
+
+/* ---------- Call-click tracking ----------
+   Logs every tap on a tel: link (call bar, header button, footer, CTAs)
+   to the leads backend so /admin can show call activity. */
+(function () {
+  'use strict';
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="tel:"]');
+    if (!a) return;
+    try {
+      var payload = JSON.stringify({
+        page: window.location.pathname,
+        label: (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'call link'
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/call', new Blob([payload], { type: 'application/json' }));
+      } else {
+        fetch('/api/call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        }).catch(function () {});
+      }
+    } catch (err) { /* tracking must never block the call */ }
+  });
+})();

@@ -7,3 +7,5 @@ server/leads.json.tmp
 server/.session-secret
 node_modules/
 _source-photos/
+server/calls.json
+server/calls.json.tmp

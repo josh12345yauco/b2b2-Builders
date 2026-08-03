@@ -17,6 +17,7 @@ const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..');
 const DATA_FILE = path.join(__dirname, 'leads.json');
+const CALLS_FILE = path.join(__dirname, 'calls.json');
 const SECRET_FILE = path.join(__dirname, '.session-secret');
 const ADMIN_HTML = path.join(__dirname, 'admin.html');
 const PORT = process.env.PORT || 8742;
@@ -51,6 +52,18 @@ function writeLeads(leads) {
   const tmp = DATA_FILE + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(leads, null, 2));
   fs.renameSync(tmp, DATA_FILE);
+}
+function readCalls() {
+  try {
+    return JSON.parse(fs.readFileSync(CALLS_FILE, 'utf8'));
+  } catch (e) {
+    return [];
+  }
+}
+function writeCalls(calls) {
+  const tmp = CALLS_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(calls, null, 2));
+  fs.renameSync(tmp, CALLS_FILE);
 }
 
 /* ---------- helpers ---------- */
@@ -138,6 +151,27 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  /* ----- public API: log a call-button click ----- */
+  if (pathname === '/api/call' && req.method === 'POST') {
+    try {
+      const payload = JSON.parse(await readBody(req));
+      const call = {
+        id: crypto.randomUUID(),
+        clickedAt: new Date().toISOString(),
+        page: typeof payload.page === 'string' ? payload.page.slice(0, 200) : '',
+        label: typeof payload.label === 'string' ? payload.label.slice(0, 60) : ''
+      };
+      const calls = readCalls();
+      calls.unshift(call);
+      if (calls.length > 5000) calls.length = 5000;
+      writeCalls(calls);
+      console.log(`[call] ${call.clickedAt} "${call.label}" on ${call.page}`);
+      return send(res, 200, { ok: true });
+    } catch (e) {
+      return send(res, 400, { ok: false, error: 'Invalid payload' });
+    }
+  }
+
   /* ----- admin auth ----- */
   if (pathname === '/api/admin/login' && req.method === 'POST') {
     try {
@@ -164,6 +198,9 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/api/admin/leads' && req.method === 'GET') {
       return send(res, 200, { ok: true, leads: readLeads() });
+    }
+    if (pathname === '/api/admin/calls' && req.method === 'GET') {
+      return send(res, 200, { ok: true, calls: readCalls() });
     }
     if (pathname === '/api/admin/export.csv' && req.method === 'GET') {
       const leads = readLeads();
