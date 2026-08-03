@@ -390,18 +390,6 @@
       cards.forEach(function (card) {
         var types = card.dataset.projectType.split(' ');
         card.hidden = filter !== 'all' && types.indexOf(filter) === -1;
-
-        // Swap the card image to one that matches the active category
-        // (e.g. Kitchens filter shows the project's kitchen, not its facade)
-        var img = card.querySelector('img[data-img-default]');
-        if (img) {
-          var src = img.getAttribute('data-img-' + filter) || img.getAttribute('data-img-default');
-          var alt = img.getAttribute('data-alt-' + filter) || img.getAttribute('data-alt-default');
-          if (img.getAttribute('src') !== src) {
-            img.setAttribute('src', src);
-            img.setAttribute('alt', alt);
-          }
-        }
       });
       trackEvent({ event: 'project_filter', filter: filter });
     });
