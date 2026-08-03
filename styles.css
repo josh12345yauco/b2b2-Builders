@@ -3698,6 +3698,36 @@ body.overlay-header .logo img,
   white-space: nowrap;
 }
 
+/* Wide desktop: pin the call button to the viewport's right edge (20px in) so
+   the right nav links get the full grid column. Both nav halves reserve the
+   same space so left/right item spacing stays symmetric. Below 1200px the
+   button stays in flow — there isn't room to pin it without crowding links. */
+@media (min-width: 1200px) {
+  .nav-split {
+    /* space the button needs beyond the container edge: ~175px button + 20px
+       edge gap + 20px breathing room, minus whatever free space already
+       exists between container and viewport edge */
+    --est-reserve: max(0px, calc(240px - var(--gutter) - max((100vw - var(--container)) / 2, 0px)));
+  }
+
+  .nav-right .nav-est {
+    position: absolute;
+    /* .nav (the containing block) is the centered container, so offset past
+       its edge to land 20px from the viewport edge on wide screens */
+    right: min(20px, calc((var(--container) - 100vw) / 2 + 20px));
+    bottom: 40px;
+    transform: translateY(50%);
+  }
+
+  .nav-right .nav-links {
+    margin-right: var(--est-reserve);
+  }
+
+  .nav-split > .nav-links {
+    margin-left: var(--est-reserve);
+  }
+}
+
 @media (max-width: 960px) {
   .nav-split .nav-right,
   .nav-split .nav-links {
