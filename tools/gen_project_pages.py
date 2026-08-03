@@ -52,6 +52,10 @@ PROJECTS = [
         "type": "Full Build",
         "categories": ["full-build", "kitchen", "bathroom"],
         "card_blurb": "Large ground-up build — custom kitchen, custom bathrooms, custom stairs.",
+        "card_variants": {
+            "kitchen": ("https://static.wixstatic.com/media/dc69ab_3ff41089664044d0b53d9e33a20258b8~mv2.png", "Custom white kitchen with island and stainless appliances"),
+            "bathroom": ("https://static.wixstatic.com/media/dc69ab_602d411d7b4c4b8cb1a2966014cab539~mv2.png", "Custom bathroom with freestanding tub"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, {SVC["stairs"]}',
         "hero_img": ("https://static.wixstatic.com/media/dc69ab_58a09638df8844398aef21b5015379da~mv2.png", "Street view of a completed custom home build in Fishtown"),
         "gallery": [
@@ -78,6 +82,9 @@ PROJECTS = [
         "type": "Full Build",
         "categories": ["full-build", "kitchen", "bathroom"],
         "card_blurb": "Ground-up custom construction — black-and-white kitchen, spa master bath, wet bar.",
+        "card_variants": {
+            "bathroom": img("modern-custom-home-east-kensington", "master-bath-freestanding-tub", "Spa master bathroom with freestanding tub and glass shower"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, {SVC["stairs"]}',
         "hero_img": img("modern-custom-home-east-kensington", "kitchen-waterfall-island-wide", "Black-and-white custom kitchen with waterfall quartz island in East Kensington"),
         "gallery": [
@@ -106,6 +113,9 @@ PROJECTS = [
         "type": "Full Build",
         "categories": ["full-build", "kitchen", "bathroom"],
         "card_blurb": "A unique gem designed and built completely by our crew — down to the built-in speakers.",
+        "card_variants": {
+            "bathroom": img("luxury-townhome-kensington", "master-bath-marble-wall", "Master bath with marble feature wall and freestanding tub"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, {SVC["stairs"]}',
         "hero_img": img("luxury-townhome-kensington", "luxury-kitchen-waterfall-island", "Luxury white kitchen with waterfall quartz island and brass globe chandelier"),
         "gallery": [
@@ -134,6 +144,10 @@ PROJECTS = [
         "type": "Property Rehab",
         "categories": ["property-rehab", "kitchen", "bathroom"],
         "card_blurb": "Full rehab with a stand-out exterior — custom kitchen, baths, and stairs inside.",
+        "card_variants": {
+            "kitchen": ("https://static.wixstatic.com/media/dc69ab_b15929ca459d491a98da67cbabf28491~mv2.jpg", "Custom kitchen with black cabinetry against exposed brick"),
+            "bathroom": ("https://static.wixstatic.com/media/dc69ab_bcd4e5eaf94d496a97fc5d6df4ffb0d9~mv2.webp", "Double vanity with brass fixtures in a custom bathroom"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, {SVC["stairs"]}',
         "hero_img": ("https://static.wixstatic.com/media/dc69ab_783e73794a7448b1adedcc422906629d~mv2.jpg", "Distinctive rehabbed rowhome facade with garage and wood balcony in Kensington"),
         "gallery": [
@@ -160,6 +174,9 @@ PROJECTS = [
         "type": "Property Rehab",
         "categories": ["property-rehab", "kitchen"],
         "card_blurb": "Home rehab with an addition, facade changes, and full interior renovation.",
+        "card_variants": {
+            "kitchen": ("https://static.wixstatic.com/media/dc69ab_df8e128588c640d1a7a13feacc9f7233~mv2.png", "Custom white kitchen after the renovation"),
+        },
         "scope_html": f'{SVC["kitchen"]}, <a href="/services/full-builds-remodeling/">addition &amp; facade changes</a>',
         "hero_img": ("https://static.wixstatic.com/media/dc69ab_af97b51b2a6f4624954588d75d2eba35~mv2.png", "Rehabbed home with addition and new facade in Port Richmond"),
         "gallery": [
@@ -184,8 +201,12 @@ PROJECTS = [
         "area": "Port Richmond",
         "area_slug": "port-richmond",
         "type": "Full Build ×5",
-        "categories": ["full-build", "kitchen", "bathroom", "concrete"],
+        "categories": ["full-build", "kitchen", "bathroom"],
         "card_blurb": "Five new homes, each with a unique custom kitchen and baths, designed and built by us.",
+        "card_variants": {
+            "kitchen": img("new-construction-port-richmond", "white-shaker-kitchen-island", "White shaker kitchen with quartz island and black window frames"),
+            "bathroom": img("new-construction-port-richmond", "floating-double-vanity-bath", "Floating double vanity with marble floor and glass shower"),
+        },
         "scope_html": f'{SVC["fullbuild"].capitalize()}, {SVC["kitchens"]} &amp; {SVC["bathrooms"]}, <a href="/services/concrete/">foundations</a>',
         "hero_img": img("new-construction-port-richmond", "open-concept-living-stairs", "Open-concept living area with kitchen island and black-railed staircase in Port Richmond"),
         "gallery": [
@@ -214,6 +235,9 @@ PROJECTS = [
         "type": "Property Rehab",
         "categories": ["property-rehab", "kitchen"],
         "card_blurb": "Client rehab with a second-floor addition and a fully renovated custom interior.",
+        "card_variants": {
+            "kitchen": ("https://static.wixstatic.com/media/dc69ab_d23f00c228b440e990dcc8fc045d2fe9~mv2.jpg", "Green custom kitchen against original brick"),
+        },
         "scope_html": f'{SVC["kitchen"]}, <a href="/services/full-builds-remodeling/">second-floor addition</a>',
         "hero_img": ("https://static.wixstatic.com/media/dc69ab_584fb1338625441989e9ff04275078f2~mv2.jpg", "Double-height living space with interior balcony in Queen Village"),
         "gallery": [
@@ -241,6 +265,9 @@ PROJECTS = [
         "type": "Gut Renovation",
         "categories": ["property-rehab", "kitchen", "bathroom"],
         "card_blurb": "Full gut renovation — exposed brick, floating reclaimed-wood stairs, navy-and-brass kitchen.",
+        "card_variants": {
+            "bathroom": img("exposed-brick-gut-renovation-kensington", "walnut-vanity-backlit-mirror", "Walnut double vanity with quartz top and backlit mirror"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, {SVC["stairs"]}, facade restoration',
         "hero_img": img("exposed-brick-gut-renovation-kensington", "navy-island-kitchen-exposed-beams", "Kitchen with navy island, whitewashed exposed joists, and brass hardware in Kensington"),
         "gallery": [
@@ -273,6 +300,9 @@ PROJECTS = [
         "type": "Full Build",
         "categories": ["full-build", "kitchen"],
         "card_blurb": "Three-story infill new build — modern panel-and-brick facade, quartz waterfall kitchen.",
+        "card_variants": {
+            "kitchen": img("new-construction-townhome-philadelphia", "kitchen-quartz-waterfall-island", "Kitchen with quartz waterfall island and black faucet"),
+        },
         "scope_html": f'{SVC["fullbuild"].capitalize()}, {SVC["kitchen"].lower()}, {SVC["concrete"]}',
         "hero_img": img("new-construction-townhome-philadelphia", "three-story-townhome-facade", "Three-story new construction townhome facade with gray panels and black brick"),
         "gallery": [
@@ -326,6 +356,9 @@ PROJECTS = [
         "type": "Property Rehab",
         "categories": ["property-rehab", "kitchen", "bathroom"],
         "card_blurb": "Full renovation with a green herringbone master bath, teal-hood kitchen, and custom art-deco entry.",
+        "card_variants": {
+            "kitchen": img("designer-rowhome-renovation-philadelphia", "teal-hood-kitchen-range", "Pro-style range with teal vent hood, subway tile, and wood shelves"),
+        },
         "scope_html": f'{SVC["kitchen"]}, {SVC["bathrooms"]}, facade &amp; porch restoration',
         "hero_img": img("designer-rowhome-renovation-philadelphia", "green-herringbone-master-bath", "Master bath with green herringbone tile shower, freestanding tub, and brass fixtures"),
         "gallery": [
@@ -735,11 +768,16 @@ def similar_card(p, heading="h3"):
 
 
 def hub_card(p):
-    hero_src = p["hero_img"][0]
+    hero_src, hero_alt = p["hero_img"]
     tag = f'{esc_plain(p["type"])} · {p["area"]}'
     types = " ".join(p["categories"])
+    # Per-category thumbnails: the filter JS swaps the card image so a
+    # "Custom Kitchens" filter shows a kitchen, not the project's facade.
+    variant_attrs = f' data-img-default="{hero_src}" data-alt-default="{hero_alt}"'
+    for cat, (v_src, v_alt) in p.get("card_variants", {}).items():
+        variant_attrs += f' data-img-{cat}="{v_src}" data-alt-{cat}="{v_alt}"'
     return f'''          <li class="hub-card" data-project-type="{types}" data-reveal>
-            <img src="{hero_src}" alt="{p["hero_img"][1]}" width="480" height="300" loading="lazy">
+            <img src="{hero_src}" alt="{hero_alt}" width="480" height="300" loading="lazy"{variant_attrs}>
             <div class="hub-card-body">
               <span class="hub-card-tag">{tag}</span>
               <h2><a href="/projects/{p["slug"]}/">{p["title"]}</a></h2>
