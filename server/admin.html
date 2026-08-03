@@ -74,6 +74,60 @@
   .stat.s-won .n { color: #2b8a3e; }
   .stat.s-calls .n { color: var(--blue); }
 
+  /* ---------- projects manager ---------- */
+  .proj-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 10px 16px 10px 10px; cursor: grab; user-select: none;
+  }
+  .proj-row.dragging { opacity: .4; }
+  .proj-row.drop-above { box-shadow: 0 -3px 0 0 var(--orange), var(--shadow); }
+  .proj-row.drop-below { box-shadow: 0 3px 0 0 var(--orange), var(--shadow); }
+  .proj-grip { color: var(--muted); flex: none; letter-spacing: 2px; font-size: 1rem; padding: 0 2px; }
+  .proj-thumb { width: 84px; height: 54px; object-fit: cover; border-radius: 8px; flex: none; background: #eee; }
+  .proj-name { font-weight: 700; font-size: .95rem; }
+  .proj-meta { color: var(--muted); font-size: .8rem; }
+  .proj-open { margin-left: auto; border: 1.5px solid var(--line); background: #fff; border-radius: 8px; padding: 7px 13px; font-family: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .proj-open:hover { border-color: var(--ink); }
+  .drag-hint { color: var(--muted); font-size: .82rem; margin: 0 0 12px; }
+
+  /* project detail */
+  .proj-detail-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .proj-detail-head h2 { font-size: 1.25rem; }
+  .back-btn { border: 1.5px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; }
+  .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .media-tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; }
+  .media-tile img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; }
+  .media-tile .vid-badge {
+    position: absolute; top: 8px; left: 8px; background: rgba(22,24,29,.75); color: #fff;
+    font-size: .66rem; font-weight: 800; letter-spacing: .08em; padding: 3px 8px; border-radius: 6px;
+  }
+  .media-tile .feat-badge {
+    position: absolute; top: 8px; right: 8px; background: var(--orange); color: #fff;
+    font-size: .66rem; font-weight: 800; letter-spacing: .08em; padding: 3px 8px; border-radius: 6px;
+  }
+  .media-tile .tile-actions { padding: 10px 12px; }
+  .media-tile .tile-actions button {
+    width: 100%; border: 1.5px solid var(--line); background: #fff; border-radius: 8px;
+    padding: 7px; font-family: inherit; font-size: .78rem; font-weight: 700; cursor: pointer;
+  }
+  .media-tile .tile-actions button:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+  .media-tile .tile-actions button:disabled { opacity: .45; cursor: default; }
+  .upload-tile {
+    border: 2px dashed var(--line); border-radius: var(--radius); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px; color: var(--muted); cursor: pointer;
+    min-height: 170px; background: transparent; font-family: inherit; font-size: .85rem; font-weight: 600;
+  }
+  .upload-tile:hover { border-color: var(--orange); color: var(--orange); }
+  .upload-tile .plus { font-size: 1.8rem; line-height: 1; }
+  #publish-btn { background: var(--orange); border-color: var(--orange); }
+  #publish-btn:hover { color: #fff; opacity: .9; }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 10px;
+    font-size: .88rem; z-index: 50; box-shadow: var(--shadow); max-width: 90vw;
+  }
+
   /* call log rows */
   .call-row {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
@@ -169,6 +223,7 @@
     <img src="/Images/logo-b2b2.png" alt="">
     <span class="title">Leads</span>
     <span class="spacer"></span>
+    <button id="publish-btn" type="button">Publish to Live Site</button>
     <a class="btn" href="/api/admin/export.csv">Export CSV</a>
     <button id="refresh-btn" type="button">Refresh</button>
     <button id="logout-btn" type="button">Log out</button>
@@ -182,6 +237,7 @@
       <button class="chip" data-f="won" aria-pressed="false" type="button">Won</button>
       <button class="chip" data-f="archived" aria-pressed="false" type="button">Archived</button>
       <button class="chip" data-f="calls" aria-pressed="false" type="button">📞 Call Clicks</button>
+      <button class="chip" data-f="projects" aria-pressed="false" type="button">🏗️ Projects</button>
       <input type="search" id="search" placeholder="Search name, phone, email…" aria-label="Search leads">
     </div>
     <div class="lead-list" id="lead-list"></div>
@@ -193,6 +249,8 @@
   'use strict';
   var leads = [];
   var calls = [];
+  var projects = [];
+  var openProject = null; // full project object when viewing detail
   var filter = 'all';
   var query = '';
   var openId = null;
@@ -266,7 +324,161 @@
     return hay.indexOf(query) !== -1;
   }
 
+  function toast(msg) {
+    var el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 3500);
+  }
+
+  /* ---------- projects manager ---------- */
+  function loadProjects() {
+    return api('/api/admin/projects').then(function (d) {
+      projects = d.projects || [];
+      renderList();
+    });
+  }
+
+  function renderProjects() {
+    if (openProject) { renderProjectDetail(); return; }
+    var rows = projects.map(function (p, i) {
+      return '<div class="proj-row" draggable="true" data-slug="' + esc(p.slug) + '" data-i="' + i + '">' +
+        '<span class="proj-grip" aria-hidden="true">⋮⋮</span>' +
+        '<img class="proj-thumb" src="' + esc(p.card) + '" alt="">' +
+        '<span><div class="proj-name">' + esc(p.title) + '</div>' +
+        '<div class="proj-meta">' + esc(p.type) + ' · ' + esc(p.area) + ' · ' + p.mediaCount + ' items</div></span>' +
+        '<button type="button" class="proj-open" data-open-slug="' + esc(p.slug) + '">Edit media</button>' +
+      '</div>';
+    }).join('');
+    $('lead-list').innerHTML =
+      '<p class="drag-hint">Drag projects to reorder them — this sets the base order on the Our Work page (the page then mixes one per category). Changes save instantly; hit "Publish to Live Site" when you\'re done.</p>' + rows;
+    wireDrag();
+  }
+
+  function wireDrag() {
+    var container = $('lead-list');
+    var dragEl = null;
+    container.querySelectorAll('.proj-row').forEach(function (row) {
+      row.addEventListener('dragstart', function () {
+        dragEl = row;
+        row.classList.add('dragging');
+      });
+      row.addEventListener('dragend', function () {
+        row.classList.remove('dragging');
+        container.querySelectorAll('.proj-row').forEach(function (r) { r.classList.remove('drop-above', 'drop-below'); });
+      });
+      row.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        if (row === dragEl) return;
+        var rect = row.getBoundingClientRect();
+        var above = e.clientY < rect.top + rect.height / 2;
+        row.classList.toggle('drop-above', above);
+        row.classList.toggle('drop-below', !above);
+      });
+      row.addEventListener('dragleave', function () {
+        row.classList.remove('drop-above', 'drop-below');
+      });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault();
+        if (!dragEl || row === dragEl) return;
+        var rect = row.getBoundingClientRect();
+        var above = e.clientY < rect.top + rect.height / 2;
+        row.parentNode.insertBefore(dragEl, above ? row : row.nextSibling);
+        row.classList.remove('drop-above', 'drop-below');
+        var slugs = Array.prototype.map.call(container.querySelectorAll('.proj-row'), function (r) { return r.dataset.slug; });
+        api('/api/admin/projects/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slugs: slugs })
+        }).then(function (d) {
+          if (d.ok) { toast('Order saved — pages rebuilding'); loadProjects(); }
+          else toast('Reorder failed: ' + (d.error || ''));
+        });
+      });
+    });
+  }
+
+  function renderProjectDetail() {
+    var p = openProject;
+    var featured = (p.card_img || p.hero_img)[0];
+    var items = [{ src: p.hero_img[0], alt: p.hero_img[1], video: null }];
+    p.gallery.forEach(function (it) {
+      if (Array.isArray(it)) items.push({ src: it[0], alt: it[1], video: null });
+      else items.push({ src: it.poster || '', alt: it.alt, video: it.video });
+    });
+    var tiles = items.map(function (it) {
+      var key = it.video ? it.poster || it.src : it.src;
+      var isFeatured = key === featured;
+      return '<div class="media-tile">' +
+        (it.video ? '<span class="vid-badge">VIDEO</span>' : '') +
+        (isFeatured ? '<span class="feat-badge">FEATURED</span>' : '') +
+        '<img src="' + esc(it.src) + '" alt="' + esc(it.alt) + '" loading="lazy">' +
+        '<div class="tile-actions"><button type="button" data-feature="' + esc(key) + '"' + (isFeatured ? ' disabled' : '') + '>' +
+        (isFeatured ? 'Featured image' : '★ Set as featured') + '</button></div>' +
+      '</div>';
+    }).join('');
+    $('lead-list').innerHTML =
+      '<div class="proj-detail-head">' +
+        '<button type="button" class="back-btn" id="proj-back">← All projects</button>' +
+        '<h2>' + esc(p.title) + '</h2>' +
+        '<span class="proj-meta">' + esc(p.type) + ' · ' + esc(p.area) + '</span>' +
+      '</div>' +
+      '<div class="media-grid">' + tiles +
+        '<button type="button" class="upload-tile" id="upload-tile"><span class="plus">+</span>Add photos or videos<br><small>jpg · png · heic · mp4 · mov</small></button>' +
+        '<input type="file" id="upload-input" multiple accept=".jpg,.jpeg,.png,.heic,.webp,.mp4,.mov,image/*,video/mp4,video/quicktime" hidden>' +
+      '</div>';
+
+    $('proj-back').addEventListener('click', function () { openProject = null; renderList(); });
+    $('upload-tile').addEventListener('click', function () { $('upload-input').click(); });
+    $('upload-input').addEventListener('change', function (e) {
+      uploadFiles(p.slug, Array.prototype.slice.call(e.target.files));
+    });
+    $('lead-list').querySelectorAll('[data-feature]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        api('/api/admin/projects/' + p.slug + '/featured', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ src: btn.dataset.feature })
+        }).then(function (d) {
+          if (d.ok) { toast('Featured image updated — pages rebuilding'); openDetail(p.slug); }
+          else toast('Failed: ' + (d.error || ''));
+        });
+      });
+    });
+  }
+
+  function uploadFiles(slug, files) {
+    if (!files.length) return;
+    var done = 0;
+    toast('Uploading ' + files.length + ' file(s)…');
+    var chain = Promise.resolve();
+    files.forEach(function (file) {
+      chain = chain.then(function () {
+        return fetch('/api/admin/projects/' + slug + '/media?filename=' + encodeURIComponent(file.name), {
+          method: 'POST',
+          body: file
+        }).then(function (r) { return r.json(); }).then(function (d) {
+          if (d.ok) done++;
+          else toast(file.name + ': ' + (d.error || 'failed'));
+        });
+      });
+    });
+    chain.then(function () {
+      toast(done + ' of ' + files.length + ' added — pages rebuilding');
+      openDetail(slug);
+      loadProjects();
+    });
+  }
+
+  function openDetail(slug) {
+    api('/api/admin/projects/' + slug).then(function (d) {
+      if (d.ok) { openProject = d.project; renderList(); }
+    });
+  }
+
   function renderList() {
+    if (filter === 'projects') { renderProjects(); return; }
     if (filter === 'calls') { renderCalls(); return; }
     var visible = leads.filter(leadMatches);
     if (!visible.length) {
@@ -367,10 +579,26 @@
     var chip = e.target.closest('.chip');
     if (!chip) return;
     filter = chip.dataset.f;
+    openProject = null;
     document.querySelectorAll('.chip').forEach(function (c) {
       c.setAttribute('aria-pressed', String(c === chip));
     });
     renderList();
+    if (filter === 'projects') loadProjects();
+  });
+
+  $('publish-btn').addEventListener('click', function () {
+    var btn = $('publish-btn');
+    btn.disabled = true;
+    btn.textContent = 'Publishing…';
+    api('/api/admin/publish', { method: 'POST' }).then(function (d) {
+      toast(d.ok ? d.message : 'Publish failed: ' + (d.error || ''));
+    }).catch(function () {
+      toast('Publish failed — is the server running?');
+    }).then(function () {
+      btn.disabled = false;
+      btn.textContent = 'Publish to Live Site';
+    });
   });
   $('search').addEventListener('input', function (e) {
     query = e.target.value.trim().toLowerCase();
@@ -378,6 +606,8 @@
   });
 
   $('lead-list').addEventListener('click', function (e) {
+    var openSlug = e.target.closest('[data-open-slug]');
+    if (openSlug) { openDetail(openSlug.dataset.openSlug); return; }
     var actBtn = e.target.closest('[data-act]');
     if (actBtn) {
       var id = actBtn.dataset.id;
@@ -400,9 +630,9 @@
     }
   });
 
-  /* auto-refresh every 60s while dashboard visible */
+  /* auto-refresh every 60s while dashboard visible (not while managing projects) */
   setInterval(function () {
-    if (!$('dash-view').classList.contains('hidden')) load();
+    if (!$('dash-view').classList.contains('hidden') && filter !== 'projects') load();
   }, 60000);
 
   load(); // if the session cookie is valid this goes straight to the dashboard
