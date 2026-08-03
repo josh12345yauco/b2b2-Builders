@@ -745,8 +745,33 @@ def hub_card(p):
     card_src, card_alt = p.get("card_img", p["hero_img"])
     tag = f'{esc_plain(p["type"])} · {p["area"]}'
     types = " ".join(p["categories"])
+
+    # Swipeable card gallery: lead image + up to 3 more from the project
+    # gallery (photos only, no repeats of the lead image).
+    slides = [(card_src, card_alt)]
+    for item in [p["hero_img"]] + p["gallery"]:
+        if isinstance(item, dict):
+            continue
+        if item[0] == card_src or any(s[0] == item[0] for s in slides):
+            continue
+        slides.append(item)
+        if len(slides) == 4:
+            break
+    slides_html = "\n".join(
+        f'                <img src="{src}" alt="{alt}" width="480" height="300" loading="lazy">'
+        for src, alt in slides
+    )
+    dots_html = "".join('<span' + (' class="on"' if i == 0 else '') + '></span>' for i in range(len(slides)))
+    arrow_svg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
     return f'''          <li class="hub-card" data-project-type="{types}" data-reveal>
-            <img src="{card_src}" alt="{card_alt}" width="480" height="300" loading="lazy">
+            <div class="hub-swipe">
+              <div class="hub-swipe-track">
+{slides_html}
+              </div>
+              <button type="button" class="hs-arrow hs-prev" aria-label="Previous photo">{arrow_svg}<path d="M15 6l-6 6 6 6"/></svg></button>
+              <button type="button" class="hs-arrow hs-next" aria-label="Next photo">{arrow_svg}<path d="M9 6l6 6-6 6"/></svg></button>
+              <div class="hub-swipe-dots" aria-hidden="true">{dots_html}</div>
+            </div>
             <div class="hub-card-body">
               <span class="hub-card-tag">{tag}</span>
               <h2><a href="/projects/{p["slug"]}/">{p["title"]}</a></h2>

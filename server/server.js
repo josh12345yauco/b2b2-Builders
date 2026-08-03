@@ -104,6 +104,12 @@ function serveFile(req, res, filePath) {
     if (err || !stat.isFile()) return send(res, 404, { error: 'Not found' });
     const ext = path.extname(filePath).toLowerCase();
     const type = MIME[ext] || 'application/octet-stream';
+    // Code/content always revalidates; heavy media can cache for a day
+    const cache = ['.html', '.css', '.js', '.xml', '.txt', '.json'].includes(ext)
+      ? 'no-cache'
+      : 'public, max-age=86400';
+    res.setHeader('Cache-Control', cache);
+    res.setHeader('Last-Modified', stat.mtime.toUTCString());
     const range = req.headers.range;
     if (range) {
       const m = /bytes=(\d*)-(\d*)/.exec(range);

@@ -578,3 +578,83 @@
     } catch (err) { /* tracking must never block the call */ }
   });
 })();
+
+/* ---------- Hidden admin shortcut ----------
+   Clicking the header logo 6 times in quick succession opens /admin.
+   A normal single click still goes home (after a 450ms beat). */
+(function () {
+  'use strict';
+  var logo = document.querySelector('a.logo');
+  if (!logo) return;
+  var count = 0;
+  var timer = null;
+  logo.addEventListener('click', function (e) {
+    e.preventDefault();
+    count++;
+    if (timer) clearTimeout(timer);
+    if (count >= 6) {
+      count = 0;
+      window.location.href = '/admin';
+      return;
+    }
+    timer = setTimeout(function () {
+      count = 0;
+      window.location.href = logo.getAttribute('href') || '/';
+    }, 450);
+  });
+})();
+
+/* ---------- Hub card swipe galleries (projects hub) ---------- */
+(function () {
+  'use strict';
+  var swipes = document.querySelectorAll('.hub-swipe');
+  if (!swipes.length) return;
+  swipes.forEach(function (sw) {
+    var track = sw.querySelector('.hub-swipe-track');
+    var dots = sw.querySelectorAll('.hub-swipe-dots span');
+    var prev = sw.querySelector('.hs-prev');
+    var next = sw.querySelector('.hs-next');
+
+    function index() {
+      return Math.round(track.scrollLeft / track.clientWidth);
+    }
+    function update() {
+      var i = index();
+      dots.forEach(function (d, n) { d.classList.toggle('on', n === i); });
+    }
+    function go(delta) {
+      // Chrome cancels smooth scrollTo() on scroll-snap containers, so
+      // animate scrollLeft manually with snap temporarily disabled.
+      var count = track.children.length;
+      var target = Math.max(0, Math.min(count - 1, index() + delta)) * track.clientWidth;
+      var start = track.scrollLeft;
+      var dist = target - start;
+      if (!dist) return;
+      // Hidden tabs get no animation frames — jump instantly there.
+      if (document.visibilityState === 'hidden') {
+        track.style.scrollSnapType = 'none';
+        track.scrollLeft = target;
+        track.style.scrollSnapType = '';
+        update();
+        return;
+      }
+      var t0 = null;
+      track.style.scrollSnapType = 'none';
+      function step(t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min(1, (t - t0) / 260);
+        track.scrollLeft = start + dist * (1 - Math.pow(1 - p, 3));
+        if (p < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          track.style.scrollSnapType = '';
+        }
+      }
+      window.requestAnimationFrame(step);
+    }
+
+    track.addEventListener('scroll', update, { passive: true });
+    if (prev) prev.addEventListener('click', function () { go(-1); });
+    if (next) next.addEventListener('click', function () { go(1); });
+  });
+})();
