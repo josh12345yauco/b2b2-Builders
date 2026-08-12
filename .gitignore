@@ -9,3 +9,4 @@ node_modules/
 _source-photos/
 server/calls.json
 server/calls.json.tmp
+server/.env

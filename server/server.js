@@ -17,8 +17,59 @@ const crypto = require('crypto');
 const { execFile } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const DATA_FILE = path.join(__dirname, 'leads.json');
-const CALLS_FILE = path.join(__dirname, 'calls.json');
+
+/* ---------- Supabase (leads + calls live in the cloud) ----------
+   server/.env is gitignored — the service_role key must never be committed. */
+const env = {};
+try {
+  fs.readFileSync(path.join(__dirname, '.env'), 'utf8').split('\n').forEach((line) => {
+    const m = line.match(/^([A-Z_]+)=(.+)$/);
+    if (m) env[m[1]] = m[2].trim();
+  });
+} catch (e) { /* handled below */ }
+const SUPABASE_URL = env.SUPABASE_URL;
+const SUPABASE_KEY = env.SUPABASE_SERVICE_KEY;
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('Missing server/.env with SUPABASE_URL and SUPABASE_SERVICE_KEY — admin data will not load.');
+}
+
+async function supa(pathAndQuery, options) {
+  const opts = Object.assign({ method: 'GET' }, options || {});
+  opts.headers = Object.assign({
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation'
+  }, opts.headers || {});
+  if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${pathAndQuery}`, opts);
+  const text = await r.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!r.ok) throw new Error(`Supabase ${r.status}: ${text.slice(0, 200)}`);
+  return data;
+}
+
+/* DB columns are snake_case; the site + admin UI speak camelCase. */
+const LEAD_FIELDS = {
+  receivedAt: 'received_at', status: 'status', source: 'source', name: 'name',
+  phone: 'phone', email: 'email', projectType: 'project_type', projectSize: 'project_size',
+  propertyType: 'property_type', ownership: 'ownership', timeline: 'timeline',
+  budget: 'budget', location: 'location', zip: 'zip', area: 'area',
+  contactPref: 'contact_pref', notes: 'notes', message: 'message', page: 'page'
+};
+function leadToApi(row) {
+  const out = { id: row.id };
+  for (const [api, col] of Object.entries(LEAD_FIELDS)) out[api] = row[col];
+  return out;
+}
+function leadToDb(payload) {
+  const out = {};
+  for (const [api, col] of Object.entries(LEAD_FIELDS)) {
+    if (api === 'receivedAt' || api === 'status') continue; // db defaults
+    if (typeof payload[api] === 'string') out[col] = payload[api].slice(0, 2000);
+  }
+  return out;
+}
 const SECRET_FILE = path.join(__dirname, '.session-secret');
 const ADMIN_HTML = path.join(__dirname, 'admin.html');
 const PORT = process.env.PORT || 8742;
@@ -41,19 +92,7 @@ function isAuthed(req) {
   return cookies.includes('b2b2_admin=' + SESSION_TOKEN);
 }
 
-/* ---------- leads store ---------- */
-function readLeads() {
-  try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-  } catch (e) {
-    return [];
-  }
-}
-function writeLeads(leads) {
-  const tmp = DATA_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(leads, null, 2));
-  fs.renameSync(tmp, DATA_FILE);
-}
+/* ---------- leads store: Supabase (see helpers above) ---------- */
 /* ---------- projects store (single source of truth for the site pages) ---------- */
 const PROJECTS_FILE = path.join(__dirname, 'projects-data.json');
 
@@ -113,17 +152,8 @@ function readRawBody(req, maxBytes) {
   });
 }
 
-function readCalls() {
-  try {
-    return JSON.parse(fs.readFileSync(CALLS_FILE, 'utf8'));
-  } catch (e) {
-    return [];
-  }
-}
-function writeCalls(calls) {
-  const tmp = CALLS_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(calls, null, 2));
-  fs.renameSync(tmp, CALLS_FILE);
+function callToApi(row) {
+  return { id: row.id, clickedAt: row.clicked_at, page: row.page, label: row.label };
 }
 
 /* ---------- helpers ---------- */
@@ -201,18 +231,13 @@ const server = http.createServer(async (req, res) => {
     try {
       const payload = JSON.parse(await readBody(req));
       if (!payload || typeof payload !== 'object') throw new Error('bad payload');
-      const lead = Object.assign({}, payload, {
-        id: crypto.randomUUID(),
-        receivedAt: new Date().toISOString(),
-        status: 'new',
-        page: req.headers.referer || ''
-      });
-      const leads = readLeads();
-      leads.unshift(lead);
-      writeLeads(leads);
-      console.log(`[lead] ${lead.receivedAt} ${lead.source || 'unknown'} — ${lead.name || ''} ${lead.phone || ''}`);
-      return send(res, 200, { ok: true, id: lead.id });
+      const row = leadToDb(payload);
+      row.page = req.headers.referer || row.page || '';
+      const inserted = await supa('leads', { method: 'POST', body: row });
+      console.log(`[lead] ${payload.source || 'unknown'} — ${payload.name || ''} ${payload.phone || ''}`);
+      return send(res, 200, { ok: true, id: inserted[0] && inserted[0].id });
     } catch (e) {
+      console.error('[lead]', e.message);
       return send(res, 400, { ok: false, error: 'Invalid submission' });
     }
   }
@@ -221,19 +246,16 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/call' && req.method === 'POST') {
     try {
       const payload = JSON.parse(await readBody(req));
-      const call = {
-        id: crypto.randomUUID(),
-        clickedAt: new Date().toISOString(),
-        page: typeof payload.page === 'string' ? payload.page.slice(0, 200) : '',
-        label: typeof payload.label === 'string' ? payload.label.slice(0, 60) : ''
-      };
-      const calls = readCalls();
-      calls.unshift(call);
-      if (calls.length > 5000) calls.length = 5000;
-      writeCalls(calls);
-      console.log(`[call] ${call.clickedAt} "${call.label}" on ${call.page}`);
+      await supa('calls', {
+        method: 'POST',
+        body: {
+          page: typeof payload.page === 'string' ? payload.page.slice(0, 200) : '',
+          label: typeof payload.label === 'string' ? payload.label.slice(0, 60) : ''
+        }
+      });
       return send(res, 200, { ok: true });
     } catch (e) {
+      console.error('[call]', e.message);
       return send(res, 400, { ok: false, error: 'Invalid payload' });
     }
   }
@@ -263,13 +285,25 @@ const server = http.createServer(async (req, res) => {
     if (!isAuthed(req)) return send(res, 401, { ok: false, error: 'Unauthorized' });
 
     if (pathname === '/api/admin/leads' && req.method === 'GET') {
-      return send(res, 200, { ok: true, leads: readLeads() });
+      try {
+        const rows = await supa('leads?select=*&order=received_at.desc&limit=2000');
+        return send(res, 200, { ok: true, leads: rows.map(leadToApi) });
+      } catch (e) {
+        console.error('[admin/leads]', e.message);
+        return send(res, 500, { ok: false, error: 'Supabase unreachable — check server/.env' });
+      }
     }
     if (pathname === '/api/admin/calls' && req.method === 'GET') {
-      return send(res, 200, { ok: true, calls: readCalls() });
+      try {
+        const rows = await supa('calls?select=*&order=clicked_at.desc&limit=5000');
+        return send(res, 200, { ok: true, calls: rows.map(callToApi) });
+      } catch (e) {
+        console.error('[admin/calls]', e.message);
+        return send(res, 500, { ok: false, error: 'Supabase unreachable — check server/.env' });
+      }
     }
     if (pathname === '/api/admin/export.csv' && req.method === 'GET') {
-      const leads = readLeads();
+      const leads = (await supa('leads?select=*&order=received_at.desc&limit=10000')).map(leadToApi);
       const cols = ['receivedAt', 'source', 'status', 'name', 'phone', 'email', 'projectType',
         'projectSize', 'propertyType', 'ownership', 'timeline', 'budget', 'location', 'zip',
         'area', 'contactPref', 'notes', 'message', 'page'];
@@ -402,26 +436,27 @@ const server = http.createServer(async (req, res) => {
 
     const leadMatch = pathname.match(/^\/api\/admin\/leads\/([a-f0-9-]+)$/);
     if (leadMatch) {
-      const leads = readLeads();
-      const idx = leads.findIndex(l => l.id === leadMatch[1]);
-      if (idx === -1) return send(res, 404, { ok: false, error: 'Not found' });
+      const id = encodeURIComponent(leadMatch[1]);
       if (req.method === 'PATCH') {
         try {
           const { status } = JSON.parse(await readBody(req));
-          if (['new', 'contacted', 'won', 'archived'].includes(status)) {
-            leads[idx].status = status;
-            writeLeads(leads);
-            return send(res, 200, { ok: true, lead: leads[idx] });
+          if (!['new', 'contacted', 'won', 'archived'].includes(status)) {
+            return send(res, 400, { ok: false, error: 'Bad status' });
           }
-          return send(res, 400, { ok: false, error: 'Bad status' });
+          const rows = await supa(`leads?id=eq.${id}`, { method: 'PATCH', body: { status } });
+          if (!rows.length) return send(res, 404, { ok: false, error: 'Not found' });
+          return send(res, 200, { ok: true, lead: leadToApi(rows[0]) });
         } catch (e) {
           return send(res, 400, { ok: false, error: 'Bad request' });
         }
       }
       if (req.method === 'DELETE') {
-        leads.splice(idx, 1);
-        writeLeads(leads);
-        return send(res, 200, { ok: true });
+        try {
+          await supa(`leads?id=eq.${id}`, { method: 'DELETE' });
+          return send(res, 200, { ok: true });
+        } catch (e) {
+          return send(res, 500, { ok: false, error: 'Delete failed' });
+        }
       }
     }
     return send(res, 404, { ok: false, error: 'Not found' });

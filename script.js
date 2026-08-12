@@ -310,13 +310,9 @@
       source: 'project-builder'
     };
 
-    // Persist the lead to the site backend (shows in /admin)
-    fetch('/api/lead', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      keepalive: true
-    }).catch(function () { /* backend offline — payload still tracked below */ });
+    // Persist the lead to Supabase (shows in the admin dashboard).
+    // The anon key is public by design and can only INSERT (row-level security).
+    window.b2b2SaveLead(payload);
 
     trackEvent({ event: 'project_builder_submit', payload: payload });
 
@@ -420,13 +416,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      // Persist the lead to the site backend (shows in /admin)
-      fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(function () { /* backend offline — payload still tracked below */ });
+      window.b2b2SaveLead(payload);
 
       trackEvent({ event: 'area_lead_submit', payload: payload });
 
@@ -465,13 +455,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      // Persist the lead to the site backend (shows in /admin)
-      fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(function () { /* backend offline — payload still tracked below */ });
+      window.b2b2SaveLead(payload);
 
       trackEvent({ event: 'contact_form_submit', payload: payload });
 
@@ -561,20 +545,10 @@
     var a = e.target.closest && e.target.closest('a[href^="tel:"]');
     if (!a) return;
     try {
-      var payload = JSON.stringify({
+      window.b2b2Supa('calls', {
         page: window.location.pathname,
         label: (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'call link'
       });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/call', new Blob([payload], { type: 'application/json' }));
-      } else {
-        fetch('/api/call', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payload,
-          keepalive: true
-        }).catch(function () {});
-      }
     } catch (err) { /* tracking must never block the call */ }
   });
 })();
@@ -657,4 +631,40 @@
     if (prev) prev.addEventListener('click', function () { go(-1); });
     if (next) next.addEventListener('click', function () { go(1); });
   });
+})();
+
+/* ---------- Supabase lead + call storage ----------
+   The anon key is safe to publish: row-level security only allows INSERTs.
+   Data is read from the admin dashboard, which uses the private service key. */
+(function () {
+  'use strict';
+  var SUPA_URL = 'https://qoabgpfqqhpyadxkuxvp.supabase.co';
+  var SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvYWJncGZxcWhweWFkeGt1eHZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzQxNTUsImV4cCI6MjEwMjExMDE1NX0.Lf4yDie6b144awYJVxQ7FFsyvGCuCTqH3FqPNyxRYT4';
+
+  window.b2b2Supa = function (table, row) {
+    try {
+      return fetch(SUPA_URL + '/rest/v1/' + table, {
+        method: 'POST',
+        headers: {
+          apikey: SUPA_ANON,
+          Authorization: 'Bearer ' + SUPA_ANON,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify(row),
+        keepalive: true
+      }).catch(function () {});
+    } catch (e) { return Promise.resolve(); }
+  };
+
+  window.b2b2SaveLead = function (p) {
+    window.b2b2Supa('leads', {
+      source: p.source, name: p.name, phone: p.phone, email: p.email,
+      project_type: p.projectType, project_size: p.projectSize,
+      property_type: p.propertyType, ownership: p.ownership,
+      timeline: p.timeline, budget: p.budget, location: p.location,
+      zip: p.zip, area: p.area, contact_pref: p.contactPref,
+      notes: p.notes, message: p.message, page: window.location.pathname
+    });
+  };
 })();
