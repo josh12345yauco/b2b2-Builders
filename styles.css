@@ -5157,6 +5157,14 @@ body.overlay-header .logo-main,
   .hero-tiles .hero-tile:nth-child(4) {
     order: 3;
   }
+
+  /* Titles read on one line — smaller font instead of wrapping */
+  .hero-tile {
+    font-size: clamp(0.625rem, 2.7vw, 0.8125rem);
+    white-space: nowrap;
+    max-width: none;
+    gap: 0.5rem;
+  }
 }
 
 
