@@ -2333,6 +2333,15 @@ html.js [data-reveal].revealed {
   background: var(--ink);
 }
 
+/* ---------- GoHighLevel embedded forms (contact + area pages) ----------
+   form_embed.js resizes the iframe to fit; min-height keeps it from
+   collapsing before the script runs. */
+.ghl-form-card iframe {
+  display: block;
+  width: 100%;
+  min-height: 814px;
+}
+
 /* ---------- Forms (contact page) ---------- */
 .field select,
 .field textarea {
