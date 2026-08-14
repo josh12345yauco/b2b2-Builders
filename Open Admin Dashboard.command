@@ -1,5 +1,5 @@
 #!/bin/bash
-# Double-click to start the B2B2 site + leads backend and open the dashboard.
+# Double-click to start the Paiz site + leads backend and open the dashboard.
 cd "$(dirname "$0")"
 
 # If something other than our Node server holds the port (e.g. the old
@@ -20,5 +20,5 @@ if ! lsof -ti :8742 -sTCP:LISTEN >/dev/null 2>&1; then
 fi
 
 open "http://localhost:8742/admin"
-echo "B2B2 admin is running at http://localhost:8742/admin (password 0000)."
+echo "Paiz admin is running at http://localhost:8742/admin (password 0000)."
 echo "You can close this window — the server keeps running."

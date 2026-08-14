@@ -312,7 +312,7 @@
 
     // Persist the lead to Supabase (shows in the admin dashboard).
     // The anon key is public by design and can only INSERT (row-level security).
-    window.b2b2SaveLead(payload);
+    window.paizSaveLead(payload);
 
     trackEvent({ event: 'project_builder_submit', payload: payload });
 
@@ -416,7 +416,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      window.b2b2SaveLead(payload);
+      window.paizSaveLead(payload);
 
       trackEvent({ event: 'area_lead_submit', payload: payload });
 
@@ -455,7 +455,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      window.b2b2SaveLead(payload);
+      window.paizSaveLead(payload);
 
       trackEvent({ event: 'contact_form_submit', payload: payload });
 
@@ -545,7 +545,7 @@
     var a = e.target.closest && e.target.closest('a[href^="tel:"]');
     if (!a) return;
     try {
-      window.b2b2Supa('calls', {
+      window.paizSupa('calls', {
         page: window.location.pathname,
         label: (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'call link'
       });
@@ -641,7 +641,7 @@
   var SUPA_URL = 'https://qoabgpfqqhpyadxkuxvp.supabase.co';
   var SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvYWJncGZxcWhweWFkeGt1eHZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzQxNTUsImV4cCI6MjEwMjExMDE1NX0.Lf4yDie6b144awYJVxQ7FFsyvGCuCTqH3FqPNyxRYT4';
 
-  window.b2b2Supa = function (table, row) {
+  window.paizSupa = function (table, row) {
     try {
       return fetch(SUPA_URL + '/rest/v1/' + table, {
         method: 'POST',
@@ -657,8 +657,8 @@
     } catch (e) { return Promise.resolve(); }
   };
 
-  window.b2b2SaveLead = function (p) {
-    window.b2b2Supa('leads', {
+  window.paizSaveLead = function (p) {
+    window.paizSupa('leads', {
       source: p.source, name: p.name, phone: p.phone, email: p.email,
       project_type: p.projectType, project_size: p.projectSize,
       property_type: p.propertyType, ownership: p.ownership,

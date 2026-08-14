@@ -1,4 +1,4 @@
--- B2B2 Builders — one-time Supabase setup
+-- Paiz Builders — one-time Supabase setup
 -- Run this once in the Supabase dashboard: SQL Editor → New query → paste → Run.
 --
 -- Security model:

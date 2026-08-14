@@ -16,7 +16,7 @@ Conventions:
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DOMAIN = "https://b2b2builders.com"  # TODO: replace placeholder domain before launch
+DOMAIN = "https://paizbuilders.com"  # TODO: replace placeholder domain before launch
 
 SVC = {
     "kitchen": '<a href="/services/kitchen-remodeling/">Custom kitchen</a>',
@@ -138,9 +138,9 @@ def hub_card(p):
 
 def page_html(p):
     plain_title = esc_plain(p["title"])
-    title_tag = f'{p["title"]} — {p["type"]} in {p["area"]} | B2B2 Builders'
+    title_tag = f'{p["title"]} — {p["type"]} in {p["area"]} | Paiz Builders'
     meta_desc = (
-        f'{plain_title} in {p["area"]}, Philadelphia — {esc_plain(p["type"]).lower()} by B2B2 Builders. '
+        f'{plain_title} in {p["area"]}, Philadelphia — {esc_plain(p["type"]).lower()} by Paiz Builders. '
         f'See the photos, scope, and story behind this project.'
     )
     url = f"{DOMAIN}/projects/{p['slug']}/"
@@ -288,18 +288,18 @@ def hub_html():
     cards_html = "\n".join(hub_card(p) for p in ordered)
     hero = "/Images/projects/new-construction-port-richmond/open-concept-living-stairs.jpg"
     meta_desc = ("Full builds, property rehabs, custom kitchens and bathrooms, concrete, and framing — "
-                 "real B2B2 Builders projects across Philadelphia's River Wards and beyond.")
+                 "real Paiz Builders projects across Philadelphia's River Wards and beyond.")
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Our Work — Philadelphia Construction Projects | B2B2 Builders</title>
+  <title>Our Work — Philadelphia Construction Projects | Paiz Builders</title>
   <meta name="description" content="{meta_desc}">
   <!-- TODO: replace placeholder domain before launch -->
   <link rel="canonical" href="{DOMAIN}/projects/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Our Work — Philadelphia Construction Projects | B2B2 Builders">
+  <meta property="og:title" content="Our Work — Philadelphia Construction Projects | Paiz Builders">
   <meta property="og:description" content="{meta_desc}">
   <meta property="og:url" content="{DOMAIN}/projects/">
   <meta property="og:image" content="{DOMAIN}{hero}">

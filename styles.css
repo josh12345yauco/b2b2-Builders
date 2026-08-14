@@ -4903,7 +4903,7 @@ html {
 }
 
 /* ==========================================================================
-   TEXT WORDMARK — B2B2 Builders. Ink on light headers, white on dark
+   TEXT WORDMARK — Paiz Builders. Ink on light headers, white on dark
    contexts (overlay heroes, footer). Sub-line in brand orange.
    ========================================================================== */
 .logo-text {
@@ -5048,7 +5048,7 @@ body.overlay-header .logo-main,
   }
 }
 
-/* Image logo sizing for the B2B2 lockup (taller than the old wordmark) */
+/* Image logo sizing for the Paiz lockup (taller than the old wordmark) */
 .nav-split .logo img {
   height: 68px;
 }

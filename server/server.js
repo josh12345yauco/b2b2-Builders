@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ==========================================================================
-   B2B2 Builders — static site server + leads backend
+   Paiz Builders — static site server + leads backend
    Zero dependencies (Node 18+). Run:  node server/server.js  (or: npm start)
 
    - Serves the static site from the repo root (same paths as production).
@@ -89,7 +89,7 @@ const SESSION_TOKEN = crypto.createHmac('sha256', secret).update(ADMIN_PASSWORD)
 
 function isAuthed(req) {
   const cookies = (req.headers.cookie || '').split(';').map(c => c.trim());
-  return cookies.includes('b2b2_admin=' + SESSION_TOKEN);
+  return cookies.includes('paiz_admin=' + SESSION_TOKEN);
 }
 
 /* ---------- leads store: Supabase (see helpers above) ---------- */
@@ -136,7 +136,7 @@ function sanitizeName(name) {
 }
 function altFromName(name) {
   const words = name.replace(/-/g, ' ').trim();
-  return words.charAt(0).toUpperCase() + words.slice(1) + ' — B2B2 Builders project photo';
+  return words.charAt(0).toUpperCase() + words.slice(1) + ' — Paiz Builders project photo';
 }
 function readRawBody(req, maxBytes) {
   return new Promise((resolve, reject) => {
@@ -266,7 +266,7 @@ const server = http.createServer(async (req, res) => {
       const { password } = JSON.parse(await readBody(req));
       if (password === ADMIN_PASSWORD) {
         return send(res, 200, { ok: true }, {
-          'Set-Cookie': `b2b2_admin=${SESSION_TOKEN}; Path=/; HttpOnly; SameSite=Strict; Max-Age=604800`
+          'Set-Cookie': `paiz_admin=${SESSION_TOKEN}; Path=/; HttpOnly; SameSite=Strict; Max-Age=604800`
         });
       }
       return send(res, 401, { ok: false, error: 'Wrong password' });
@@ -276,7 +276,7 @@ const server = http.createServer(async (req, res) => {
   }
   if (pathname === '/api/admin/logout' && req.method === 'POST') {
     return send(res, 200, { ok: true }, {
-      'Set-Cookie': 'b2b2_admin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0'
+      'Set-Cookie': 'paiz_admin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0'
     });
   }
 
@@ -310,7 +310,7 @@ const server = http.createServer(async (req, res) => {
       const rows = [cols.join(',')].concat(leads.map(l => cols.map(c => csvEscape(l[c])).join(',')));
       return send(res, 200, rows.join('\n'), {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="b2b2-leads.csv"'
+        'Content-Disposition': 'attachment; filename="paiz-leads.csv"'
       });
     }
     /* ----- projects management ----- */
@@ -487,7 +487,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`B2B2 Builders site + leads backend running:`);
+  console.log(`Paiz Builders site + leads backend running:`);
   console.log(`  Site:  http://localhost:${PORT}/`);
   console.log(`  Admin: http://localhost:${PORT}/admin  (password: ${ADMIN_PASSWORD})`);
 });

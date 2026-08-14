@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # TODO: replace placeholder domain before launch
-Sitemap: https://b2b2builders.com/sitemap.xml
+Sitemap: https://paizbuilders.com/sitemap.xml
