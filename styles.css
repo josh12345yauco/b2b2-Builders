@@ -419,7 +419,6 @@ h2 {
 .mobile-menu-logo {
   height: 52px;
   width: auto;
-  filter: invert(1) hue-rotate(180deg);
 }
 
 .mobile-menu-close {
@@ -3696,21 +3695,20 @@ body.overlay-header .lp-hero {
 
 
 /* ==========================================================================
-   IMAGE LOGO — white artwork with orange accents. Shown as-is on dark
-   contexts; invert+hue-rotate derives the dark version for light headers
-   (white → ink, orange stays orange).
+   IMAGE LOGO — two files: logo-paiz-on-light.png (dark text, light headers)
+   and logo-paiz-on-dark.png (white text, dark contexts). Dark-hero pages
+   swap the header image via content:url().
    ========================================================================== */
 
 .logo img {
   display: block;
   height: 56px;
   width: auto;
-  filter: invert(1) hue-rotate(180deg);
 }
 
 body.overlay-header .logo img,
 .site-footer .logo img {
-  filter: none;
+  content: url("/Images/logo-paiz-on-dark.png");
 }
 
 .site-footer .logo img {
