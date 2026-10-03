@@ -10,3 +10,6 @@ _source-photos/
 server/calls.json
 server/calls.json.tmp
 server/.env
+
+# raw photo drops — import into Images/projects/ instead of publishing originals
+projects/Add projects and work/

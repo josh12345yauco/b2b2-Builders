@@ -5,8 +5,7 @@ Run: python3 tools/gen_project_pages.py && python3 tools/inject_partials.py
 
 Conventions:
 - Local images live in /Images/projects/<slug>/ with SEO filenames (1600px, q75 JPEG).
-- Gallery items are (src, alt) tuples. src starting with "http" is a legacy Wix
-  hot-link (TODO: self-host before launch). A dict item {"video":..., "poster":..., "alt":...}
+- Gallery items are (src, alt) tuples, all self-hosted. A dict item {"video":..., "poster":..., "alt":...}
   renders a lazy <video> tile.
 - "categories" drives the hub filter chips (data-project-type). First category is
   also used for the card tag label via TYPE_LABELS.
@@ -16,8 +15,7 @@ Conventions:
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DOMAIN = "https://paizbuilders.com"  # TODO: replace placeholder domain before launch
-
+DOMAIN = "https://www.paizbuilders.com"
 SVC = {
     "kitchen": '<a href="/services/kitchen-remodeling/">Custom kitchen</a>',
     "kitchens": '<a href="/services/kitchen-remodeling/">custom kitchens</a>',
@@ -59,7 +57,84 @@ TYPE_LABELS = {
     "bathroom": "Custom Bathrooms",
     "concrete": "Concrete",
     "framing": "Framing",
+    "decks-patios": "Decks &amp; Patios",
+    "finishing": "Finishing",
 }
+
+# Page-level geo tags use neighborhood centroids, never street addresses.
+# "lat;lon" keyed by area_slug, geocoded against OpenStreetMap (Sep 2026).
+# GEO_BY_AREA overrides by display name; CITY_GEO covers citywide projects.
+GEO = {
+    "fishtown": "39.9733;-75.1304",
+    "east-kensington": "39.9837;-75.1274",
+    "port-richmond": "39.9864;-75.1009",
+    "northern-liberties": "39.9650;-75.1419",
+    "queen-village": "39.9391;-75.1494",
+    "center-city": "39.9524;-75.1636",
+    "montgomery-county": "40.2154;-75.3702",
+}
+GEO_BY_AREA = {"Kensington": "39.9859;-75.1318"}
+CITY_GEO = "39.9527;-75.1635"
+CITYWIDE = ("Philadelphia", "Greater Philadelphia")
+
+
+def area_href(p):
+    """Projects without a confirmed neighborhood (area_slug "") link to the hub."""
+    return f'/service-areas/{p["area_slug"]}/' if p.get("area_slug") else "/service-areas/"
+
+
+def where_text(p):
+    if p["area"] == "Philadelphia":
+        return "Philadelphia"
+    if p["area"] == "Greater Philadelphia":
+        return "the Philadelphia area"
+    return f'{p["area"]}, Philadelphia'
+
+
+def geo_meta(p):
+    citywide = p["area"] in CITYWIDE
+    placename = "Philadelphia, Pennsylvania" if citywide else f'{p["area"]}, Philadelphia, Pennsylvania'
+    position = CITY_GEO if citywide else GEO_BY_AREA.get(p["area"]) or GEO.get(p.get("area_slug"), CITY_GEO)
+    lat, lon = position.split(";")
+    return placename, lat, lon
+
+
+def gallery_ld(p, url, description):
+    """ImageGallery structured data: every photo with its caption, credit, and place."""
+    placename, lat, lon = geo_meta(p)
+    maker = {"@type": "GeneralContractor", "name": "Paiz Builders", "url": f"{DOMAIN}/",
+             "telephone": "+1-215-888-4384"}
+    address = {"@type": "PostalAddress", "addressRegion": "PA", "addressCountry": "US"}
+    if p["area"] != "Greater Philadelphia":
+        address["addressLocality"] = "Philadelphia"
+    photos = [p["hero_img"]] + [it for it in p["gallery"] if not isinstance(it, dict)]
+    data = {
+        "@context": "https://schema.org",
+        "@type": "ImageGallery",
+        "name": f'{esc_plain(p["title"])} — {esc_plain(p["type"])}',
+        "description": description,
+        "url": url,
+        "creator": maker,
+        "contentLocation": {
+            "@type": "Place",
+            "name": placename if p["area"] != "Greater Philadelphia" else "Greater Philadelphia, Pennsylvania",
+            "address": address,
+            "geo": {"@type": "GeoCoordinates", "latitude": float(lat), "longitude": float(lon)},
+        },
+        "image": [
+            {
+                "@type": "ImageObject",
+                "contentUrl": src if src.startswith("http") else DOMAIN + src,
+                "caption": esc_plain(alt),
+                "creditText": "Paiz Builders",
+                "copyrightNotice": "© Paiz Builders",
+                "creator": {"@type": "Organization", "name": "Paiz Builders"},
+            }
+            for src, alt in photos
+        ],
+    }
+    body = json.dumps(data, indent=2, ensure_ascii=False).replace("</", "<\\/")
+    return "  <script type=\"application/ld+json\">\n" + body + "\n  </script>"
 
 
 def esc_plain(html_text):
@@ -138,15 +213,24 @@ def hub_card(p):
 
 def page_html(p):
     plain_title = esc_plain(p["title"])
-    title_tag = f'{p["title"]} — {p["type"]} in {p["area"]} | Paiz Builders'
-    meta_desc = (
-        f'{plain_title} in {p["area"]}, Philadelphia — {esc_plain(p["type"]).lower()} by Paiz Builders. '
+    # Longest variant that still fits a search result title (~65 characters).
+    title_tag = next(
+        (t for t in (
+            f'{p["title"]} — {p["type"]} in {p["area"]} | Paiz Builders',
+            f'{p["title"]} in {p["area"]} | Paiz Builders',
+        ) if len(esc_plain(t)) <= 65),
+        f'{p["title"]} | Paiz Builders',
+    )
+    meta_desc = p.get("meta_desc") or (
+        f'{plain_title} in {where_text(p)} — {esc_plain(p["type"]).lower()} by Paiz Builders. '
         f'See the photos, scope, and story behind this project.'
     )
     url = f"{DOMAIN}/projects/{p['slug']}/"
     hero_src, hero_alt = p["hero_img"]
     og_image = hero_src if hero_src.startswith("http") else DOMAIN + hero_src
     todo = f'\n        <!-- TODO: {p["todo"]} -->' if p.get("todo") else ""
+    placename, lat, lon = geo_meta(p)
+    gallery_ld_html = gallery_ld(p, url, esc_plain(meta_desc))
 
     gallery_items = [gallery_item(p["hero_img"], first=True)]
     gallery_items += [gallery_item(it) for it in p["gallery"]]
@@ -163,6 +247,12 @@ def page_html(p):
             f'<a href="/projects/{parent["slug"]}/">see the full project</a>, or start your own with a '
             f'<a href="/contact/">free estimate</a>.</p>'
         )
+    elif not p.get("area_slug"):
+        parent_note = (
+            '\n          <p>We build across Philadelphia and the surrounding counties — see where on our '
+            '<a href="/service-areas/">service areas page</a>, or start your own project with a '
+            '<a href="/contact/">free estimate</a>.</p>'
+        )
     else:
         parent_note = (
             f'\n          <p>This project sits in {p["area"]} — see everything we build there on our '
@@ -177,14 +267,20 @@ def page_html(p):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title_tag}</title>
   <meta name="description" content="{meta_desc}">
-  <!-- TODO: replace placeholder domain before launch -->
   <link rel="canonical" href="{url}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{title_tag}">
   <meta property="og:description" content="{meta_desc}">
   <meta property="og:url" content="{url}">
   <meta property="og:image" content="{og_image}">
+  <meta property="og:image:alt" content="{hero_alt}">
+  <meta property="og:site_name" content="Paiz Builders">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="geo.region" content="US-PA">
+  <meta name="geo.placename" content="{placename}">
+  <meta name="geo.position" content="{lat};{lon}">
+  <meta name="ICBM" content="{lat}, {lon}">
 <!-- HEAD-COMMON-START -->
 <!-- HEAD-COMMON-END -->
   <script type="application/ld+json">
@@ -198,6 +294,7 @@ def page_html(p):
     ]
   }}
   </script>
+{gallery_ld_html}
 </head>
 <body>
 <!-- SITE-HEADER-START -->
@@ -211,7 +308,7 @@ def page_html(p):
         <p class="eyebrow">[ {p["type"]} ]</p>
         <h1>{p["title"]}, <em class="accent">{p["area"]}</em>.</h1>
         <dl class="project-meta" style="max-width: 640px; margin-top: 2rem;">
-          <div><dt>Neighborhood</dt><dd><a href="/service-areas/{p["area_slug"]}/">{p["area"]}</a></dd></div>
+          <div><dt>Neighborhood</dt><dd><a href="{area_href(p)}">{p["area"]}</a></dd></div>
           <div><dt>Project type</dt><dd>{p["type"]}</dd></div>
           <div><dt>Scope</dt><dd>{p["scope_html"]}</dd></div>
         </dl>
@@ -277,8 +374,9 @@ def hub_html():
         chips.append(f'          <button type="button" class="filter-chip" data-filter="{key}" aria-pressed="false">{label}</button>')
     chips_html = "\n".join(chips)
     # "All Projects" order: round-robin one project per category —
-    # kitchen, bathroom, concrete, framing, full build, rehab — and repeat.
-    rotation = ["kitchen", "bathroom", "concrete", "framing", "full-build", "property-rehab"]
+    # kitchen, bathroom, concrete, framing, full build, rehab, decks, finishing — and repeat.
+    rotation = ["kitchen", "bathroom", "concrete", "framing", "full-build", "property-rehab",
+                "decks-patios", "finishing"]
     buckets = {c: [p for p in PROJECTS if p["categories"][0] == c] for c in rotation}
     ordered = []
     while any(buckets.values()):
@@ -287,8 +385,8 @@ def hub_html():
                 ordered.append(buckets[c].pop(0))
     cards_html = "\n".join(hub_card(p) for p in ordered)
     hero = "/Images/projects/new-construction-port-richmond/open-concept-living-stairs.jpg"
-    meta_desc = ("Full builds, property rehabs, custom kitchens and bathrooms, concrete, and framing — "
-                 "real Paiz Builders projects across Philadelphia's River Wards and beyond.")
+    meta_desc = ("Full builds, rehabs, custom kitchens and baths, concrete, framing, decks, and finishing — "
+                 "real Paiz Builders projects across Philadelphia.")
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -296,7 +394,6 @@ def hub_html():
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Work — Philadelphia Construction Projects | Paiz Builders</title>
   <meta name="description" content="{meta_desc}">
-  <!-- TODO: replace placeholder domain before launch -->
   <link rel="canonical" href="{DOMAIN}/projects/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Our Work — Philadelphia Construction Projects | Paiz Builders">
@@ -328,7 +425,7 @@ def hub_html():
       <div class="container">
         <p class="eyebrow">[ Our Work ]</p>
         <h1>Recent <em class="accent">Projects</em>.</h1>
-        <p class="page-hero-sub">Real streets, real results — full builds, property rehabs, custom kitchens and baths, concrete, and framing across Philadelphia's River Wards and Queen Village. Every project here was built by our crew, with the owner on site.</p>
+        <p class="page-hero-sub">Real streets, real results — full builds, property rehabs, custom kitchens and baths, concrete, framing, decks and patios, and finishing across Philadelphia's River Wards and Queen Village. Every project here was built by our crew, with the owner on site.</p>
       </div>
     </section>
 

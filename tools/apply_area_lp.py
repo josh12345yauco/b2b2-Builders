@@ -20,8 +20,8 @@ AREAS = [
         "sub": "Townhomes, converted lofts, and roof decks — a neighborhood where building well means handling the construction and the coordination: HOAs, COIs, and streets never designed for a lumber delivery.",
         "zip": "19123",
         "slides": [
-            (WIX + "58a09638df8844398aef21b5015379da~mv2.png", 940),
-            (WIX + "717fd78dc4a848d9b25c41d48cdb9158~mv2.jpg", 1067),
+            ("/Images/projects/custom-home-build-fishtown/street-view-completed-custom-home-build.jpg", 940),
+            ("/Images/site/white-kitchen-waterfall-island-kensington.jpg", 1067),
             (IMG + "vecteezy_white-and-wooden-bathroom-interior-design_23826214.jpg", 1067),
         ],
         "bullets": [
@@ -47,9 +47,9 @@ AREAS = [
         "sub": "Shells, long-vacant rowhomes, and empty lots turning back into homes. This is where we do our heaviest lifting — full systems replacement isn't the exception in East Kensington, it's the job description.",
         "zip": "19125",
         "slides": [
-            (WIX + "f0f2c5b4b264485cb8651cadbb1cd684~mv2.jpg", 1067),
-            (WIX + "1002c95c22bc4664b455e2ae4b82b2c8~mv2.jpg", 1067),
-            (WIX + "635a04e5a5f14eb8bac5c24e3844729b~mv2.png", 940),
+            ("/Images/projects/modern-custom-home-east-kensington/dark-modern-facade-ground-up-custom.jpg", 1067),
+            ("/Images/site/custom-black-kitchen-east-kensington.jpg", 1067),
+            ("/Images/site/rowhome-framing-gut-renovation.jpg", 940),
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, Philadelphia L&amp;I permits pulled on every job'),
@@ -74,9 +74,9 @@ AREAS = [
         "sub": "Solid workers' rowhomes with good bones, and river-side blocks where new construction is filling in. We've built five new homes here and updated plenty of old ones — both kinds of work, done with respect for the block.",
         "zip": "19134",
         "slides": [
-            (WIX + "d289858275cc4544a6beae9f3391d807~mv2.jpg", 1067),
-            (WIX + "df8e128588c640d1a7a13feacc9f7233~mv2.png", 940),
-            (WIX + "8cbe01d515744a96b5f90dd0a91f2455~mv2.png", 940),
+            ("/Images/site/five-new-homes-port-richmond.jpg", 1067),
+            ("/Images/projects/home-addition-rehab-port-richmond/custom-white-kitchen-renovation.jpg", 940),
+            ("/Images/site/white-gloss-kitchen-chimney-hood.jpg", 940),
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, Philadelphia L&amp;I permits pulled on every job'),
@@ -101,9 +101,9 @@ AREAS = [
         "sub": "Some of the oldest housing stock in Philadelphia — which means some of the most demanding renovation work in the city. In Queen Village, craftsmanship isn't a selling point; it's the entry fee.",
         "zip": "19147",
         "slides": [
-            (WIX + "584fb1338625441989e9ff04275078f2~mv2.jpg", 1067),
-            (WIX + "d23f00c228b440e990dcc8fc045d2fe9~mv2.jpg", 1067),
-            (WIX + "612b24a376a44e90ba3bfb42be6682ba~mv2.jpg", 1067),
+            ("/Images/projects/property-rehab-queen-village/double-height-living-space-interior-balcony.jpg", 1067),
+            ("/Images/projects/property-rehab-queen-village/green-custom-kitchen-original-brick-queen.jpg", 1067),
+            ("/Images/projects/property-rehab-queen-village/sunroom-opening-rear-garden.jpg", 1067),
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — PA HIC #PA045678, with historic-review experience where blocks require it'),
@@ -130,7 +130,7 @@ AREAS = [
         "slides": [
             (IMG + "vecteezy_modern-kitchen-with-wooden-cabinets-and-stainless-steel_74135527.jpeg", 940),
             (IMG + "vecteezy_white-and-wooden-bathroom-interior-design_23826214.jpg", 1067),
-            (WIX + "717fd78dc4a848d9b25c41d48cdb9158~mv2.jpg", 1067),
+            ("/Images/site/white-kitchen-waterfall-island-kensington.jpg", 1067),
         ],
         "bullets": [
             ("shield", '<strong>Licensed &amp; insured</strong> — COIs naming your association, ready before the management office asks'),
@@ -203,7 +203,6 @@ def build_hero(a):
     return f"""    <!-- Split hero: auto-cycling background, pitch left, lead form right -->
     <section class="lp-hero lp-hero-dark">
       <div class="hero-slides" aria-hidden="true">
-        <!-- TODO: optimize/compress hero images before launch (serve ~1600px webp); self-host any wixstatic images -->
 {slides}      </div>
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="container">

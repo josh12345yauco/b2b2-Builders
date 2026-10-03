@@ -314,15 +314,37 @@
     // The anon key is public by design and can only INSERT (row-level security).
     window.paizSaveLead(payload);
 
-    trackEvent({ event: 'project_builder_submit', payload: payload });
+    // Email the lead to the owner via Formspree; the success panel waits for
+    // this so a failed send is never silently swallowed.
+    var lastStep = stepEl(TOTAL);
+    var errorEl = lastStep.querySelector('.builder-error');
+    var errorDefault = errorEl ? errorEl.innerHTML : '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending\u2026';
 
-    steps.forEach(function (fs) { fs.hidden = true; });
-    controls.hidden = true;
-    stepLabel.textContent = 'Done';
-    progressFill.style.width = '100%';
-    progressBar.setAttribute('aria-valuenow', String(TOTAL));
-    successPanel.hidden = false;
-    successPanel.focus();
+    window.paizEmailLead(payload).then(function (ok) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit My Project';
+      if (!ok) {
+        if (errorEl) {
+          errorEl.innerHTML = 'We couldn\u2019t send that just now. Please try again, or call <a href="tel:+12158884384">215-888-4384</a>.';
+          errorEl.hidden = false;
+        }
+        trackEvent({ event: 'project_builder_email_failed' });
+        return;
+      }
+      if (errorEl) errorEl.innerHTML = errorDefault;
+
+      trackEvent({ event: 'project_builder_submit', payload: payload });
+
+      steps.forEach(function (fs) { fs.hidden = true; });
+      controls.hidden = true;
+      stepLabel.textContent = 'Done';
+      progressFill.style.width = '100%';
+      progressBar.setAttribute('aria-valuenow', String(TOTAL));
+      successPanel.hidden = false;
+      successPanel.focus();
+    });
   });
 
   showStep(1, false);
@@ -391,6 +413,38 @@
     });
   }
 
+  /* Send a simple lead form: email it, then reveal the success panel. */
+  function sendSimpleLead(formEl, payload, eventName, hideSelector) {
+    var btn = formEl.querySelector('button[type="submit"]');
+    var errorEl = formEl.querySelector('.builder-error');
+    var errorDefault = errorEl ? errorEl.innerHTML : '';
+    var btnLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending\u2026'; }
+
+    window.paizSaveLead(payload);
+
+    window.paizEmailLead(payload).then(function (ok) {
+      if (btn) { btn.disabled = false; btn.textContent = btnLabel; }
+      if (!ok) {
+        if (errorEl) {
+          errorEl.innerHTML = 'We couldn\u2019t send that just now. Please try again, or call <a href="tel:+12158884384">215-888-4384</a>.';
+          errorEl.hidden = false;
+        }
+        trackEvent({ event: eventName + '_email_failed' });
+        return;
+      }
+      if (errorEl) { errorEl.innerHTML = errorDefault; errorEl.hidden = true; }
+      trackEvent({ event: eventName, payload: payload });
+      formEl.querySelectorAll(hideSelector).forEach(function (el) { el.hidden = true; });
+      var success = formEl.querySelector('.form-success');
+      if (success) {
+        success.hidden = false;
+        success.setAttribute('tabindex', '-1');
+        success.focus();
+      }
+    });
+  }
+
   /* ---------- Area landing page lead form ---------- */
   var leadForm = document.getElementById('area-lead-form');
   if (leadForm) {
@@ -416,19 +470,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      window.paizSaveLead(payload);
-
-      trackEvent({ event: 'area_lead_submit', payload: payload });
-
-      leadForm.querySelectorAll('.field, .field-row, .builder-controls').forEach(function (el) {
-        el.hidden = true;
-      });
-      var success = leadForm.querySelector('.form-success');
-      if (success) {
-        success.hidden = false;
-        success.setAttribute('tabindex', '-1');
-        success.focus();
-      }
+      sendSimpleLead(leadForm, payload, 'area_lead_submit', '.field, .field-row, .builder-controls');
     });
   }
 
@@ -455,19 +497,7 @@
       }
       if (errorEl) errorEl.hidden = true;
 
-      window.paizSaveLead(payload);
-
-      trackEvent({ event: 'contact_form_submit', payload: payload });
-
-      contactForm.querySelectorAll('.field, .field-row, .builder-controls, button[type="submit"]').forEach(function (el) {
-        el.hidden = true;
-      });
-      var success = contactForm.querySelector('.form-success');
-      if (success) {
-        success.hidden = false;
-        success.setAttribute('tabindex', '-1');
-        success.focus();
-      }
+      sendSimpleLead(contactForm, payload, 'contact_form_submit', '.field, .field-row, .builder-controls');
     });
   }
 })();
@@ -655,6 +685,44 @@
         keepalive: true
       }).catch(function () {});
     } catch (e) { return Promise.resolve(); }
+  };
+
+  /* Formspree — emails every lead (Project Builder, contact page, service-area
+     forms) to the owner. The endpoint is public by design; Formspree handles
+     spam filtering and keeps a copy of each submission. */
+  var FORMSPREE_URL = 'https://formspree.io/f/mbgleqzg';
+
+  var LEAD_LABELS = [
+    ['name', 'Name'], ['phone', 'Phone'], ['email', 'Email'], ['contactPref', 'Best way to reach'],
+    ['projectType', 'Project type'], ['projectSize', 'Project size'], ['propertyType', 'Property type'],
+    ['ownership', 'Ownership'], ['timeline', 'Timeline'], ['budget', 'Budget'],
+    ['area', 'Service area'], ['zip', 'ZIP code'], ['location', 'Location'],
+    ['message', 'Message'], ['notes', 'Notes']
+  ];
+  var LEAD_SOURCES = {
+    'project-builder': 'Project Builder',
+    'contact-page-form': 'Contact page',
+    'area-landing-form': 'Service area page'
+  };
+
+  window.paizEmailLead = function (p) {
+    var where = LEAD_SOURCES[p.source] || 'Website';
+    if (p.area) where += ' (' + p.area + ')';
+    var fields = {
+      _subject: 'New lead from ' + where + ': ' + (p.projectType || 'Project') + ' \u2014 ' + (p.name || ''),
+      _replyto: p.email || ''
+    };
+    LEAD_LABELS.forEach(function (pair) {
+      if (p[pair[0]]) fields[pair[1]] = p[pair[0]];
+    });
+    fields['Submitted from'] = window.location.href;
+    try {
+      return fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields)
+      }).then(function (r) { return r.ok; }).catch(function () { return false; });
+    } catch (e) { return Promise.resolve(false); }
   };
 
   window.paizSaveLead = function (p) {

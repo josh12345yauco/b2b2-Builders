@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>General Contractor in Queen Village, Philadelphia | Paiz Builders</title>
   <meta name="description" content="Queen Village contractor for some of Philadelphia's oldest homes — careful renovations in 200-year-old structures, like our rehab with a second-floor addition.">
-  <!-- TODO: replace placeholder domain before launch -->
-  <link rel="canonical" href="https://paizbuilders.com/service-areas/queen-village/">
+  <link rel="canonical" href="https://www.paizbuilders.com/service-areas/queen-village/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="General Contractor in Queen Village, Philadelphia | Paiz Builders">
   <meta property="og:description" content="Careful renovations in 200-year-old structures — like our rehab in Queen Village.">
-  <meta property="og:url" content="https://paizbuilders.com/service-areas/queen-village/">
-  <meta property="og:image" content="https://static.wixstatic.com/media/dc69ab_584fb1338625441989e9ff04275078f2~mv2.jpg">
+  <meta property="og:url" content="https://www.paizbuilders.com/service-areas/queen-village/">
+  <meta property="og:image" content="https://www.paizbuilders.com/Images/projects/property-rehab-queen-village/double-height-living-space-interior-balcony.jpg">
   <meta name="twitter:card" content="summary_large_image">
 <!-- HEAD-COMMON-START -->
   <link rel="icon" type="image/png" href="/Images/favicon.png">
@@ -26,9 +25,9 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://paizbuilders.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://paizbuilders.com/service-areas/" },
-      { "@type": "ListItem", "position": 3, "name": "Queen Village", "item": "https://paizbuilders.com/service-areas/queen-village/" }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.paizbuilders.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Service Areas", "item": "https://www.paizbuilders.com/service-areas/" },
+      { "@type": "ListItem", "position": 3, "name": "Queen Village", "item": "https://www.paizbuilders.com/service-areas/queen-village/" }
     ]
   }
   </script>
@@ -117,10 +116,9 @@
     <!-- Split hero: auto-cycling background, pitch left, lead form right -->
     <section class="lp-hero lp-hero-dark">
       <div class="hero-slides" aria-hidden="true">
-        <!-- TODO: optimize/compress hero images before launch (serve ~1600px webp); self-host any wixstatic images -->
-        <img class="hero-slide" src="https://static.wixstatic.com/media/dc69ab_584fb1338625441989e9ff04275078f2~mv2.jpg" alt="" width="1600" height="1067" fetchpriority="high">
-        <img class="hero-slide" src="https://static.wixstatic.com/media/dc69ab_d23f00c228b440e990dcc8fc045d2fe9~mv2.jpg" alt="" width="1600" height="1067" loading="lazy">
-        <img class="hero-slide" src="https://static.wixstatic.com/media/dc69ab_612b24a376a44e90ba3bfb42be6682ba~mv2.jpg" alt="" width="1600" height="1067" loading="lazy">
+        <img class="hero-slide" src="/Images/projects/property-rehab-queen-village/double-height-living-space-interior-balcony.jpg" alt="" width="1600" height="1067" fetchpriority="high">
+        <img class="hero-slide" src="/Images/projects/property-rehab-queen-village/green-custom-kitchen-original-brick-queen.jpg" alt="" width="1600" height="1067" loading="lazy">
+        <img class="hero-slide" src="/Images/projects/property-rehab-queen-village/sunroom-opening-rear-garden.jpg" alt="" width="1600" height="1067" loading="lazy">
       </div>
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="container">
@@ -156,30 +154,71 @@
           </div>
 
           <!-- Lead form -->
-          <div class="builder lead-card ghl-form-card">
+          <form class="builder lead-card" id="area-lead-form" data-area="Queen Village" novalidate>
             <h2>Get Your Free Queen Village Estimate</h2>
             <p class="lead-card-sub">Tell us the basics — we'll call you back within one business day with next steps and a walkthrough time.</p>
-            <iframe
-              src="https://links.legacylinqdigital.com/widget/form/J2eJSKNVOAP17o5QNigK"
-              style="width:100%;height:100%;border:none;border-radius:8px"
-              id="inline-J2eJSKNVOAP17o5QNigK"
-              data-layout="{'id':'INLINE'}"
-              data-trigger-type="alwaysShow"
-              data-trigger-value=""
-              data-activation-type="alwaysActivated"
-              data-activation-value=""
-              data-deactivation-type="neverDeactivate"
-              data-deactivation-value=""
-              data-form-name="Form 0"
-              data-height="814"
-              data-layout-iframe-id="inline-J2eJSKNVOAP17o5QNigK"
-              data-form-id="J2eJSKNVOAP17o5QNigK"
-              title="Get your free estimate"
-            ></iframe>
-            <script src="https://links.legacylinqdigital.com/js/form_embed.js"></script>
-
+            <div class="field-row" style="margin-top: 1.25rem;">
+              <div class="field">
+                <label for="lf-name">Name</label>
+                <input type="text" id="lf-name" name="name" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="lf-phone">Phone</label>
+                <input type="tel" id="lf-phone" name="phone" autocomplete="tel" required>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="lf-type">Project type</label>
+                <select id="lf-type" name="projectType">
+                  <option>Kitchen</option>
+                  <option>Bathroom</option>
+                  <option>Full Build / Remodel</option>
+                  <option>Addition / Roof Deck</option>
+                  <option>Concrete</option>
+                  <option>Framing / Structural</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="lf-zip">ZIP code</label>
+                <input type="text" id="lf-zip" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="19147" required>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="lf-budget">Budget range</label>
+                <select id="lf-budget" name="budget">
+                  <option>Not sure yet</option>
+                  <option>Under $25k</option>
+                  <option>$25k–$75k</option>
+                  <option>$75k–$150k</option>
+                  <option>$150k+</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="lf-timeline">How soon?</label>
+                <select id="lf-timeline" name="timeline">
+                  <option>ASAP</option>
+                  <option>1–3 months</option>
+                  <option>3–6 months</option>
+                  <option>Just planning</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="lf-notes">Anything we should know?</label>
+              <textarea id="lf-notes" name="notes" style="min-height: 90px;" placeholder="Street, current condition, what you want done…"></textarea>
+            </div>
+            <p class="builder-error" hidden>Add your name, phone, and ZIP so we can reach you.</p>
+            <div class="builder-controls">
+              <button type="submit" class="btn btn-primary btn-lg">Get My Free Estimate</button>
+            </div>
+            <div class="form-success" hidden>
+              <p>Got it — we'll reach out within one business day. Or call us now: <a href="tel:+12158884384"><strong>215-888-4384</strong></a></p>
+            </div>
             <p class="lead-card-alt">Prefer a faster answer? <a href="/project-builder/"><strong>Price your project in 60 seconds →</strong></a></p>
-          </div>
+          </form>
         </div>
       </div>
     </section>
@@ -212,7 +251,6 @@
             <h2>What Queen Village Neighbors <em class="accent">Say</em>.</h2>
           </div>
         </div>
-        <!-- TODO: FILLER reviews — replace with real Google reviews (verbatim, with real names) before launch -->
         <ul class="lp-reviews-grid">
           <li class="review-card" data-reveal>
             <p class="stars" aria-label="5 out of 5 stars"><span aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span></p>
@@ -283,7 +321,7 @@
         </div>
         <ul class="hub-grid">
           <li class="hub-card" data-reveal>
-            <img src="https://static.wixstatic.com/media/dc69ab_584fb1338625441989e9ff04275078f2~mv2.jpg" alt="Double-height living space in Queen Village" width="480" height="300" loading="lazy">
+            <img src="/Images/projects/property-rehab-queen-village/double-height-living-space-interior-balcony.jpg" alt="Double-height living space in Queen Village" width="480" height="300" loading="lazy">
             <div class="hub-card-body">
               <span class="hub-card-tag">Property Rehab · Queen Village</span>
               <h3><a href="/projects/property-rehab-queen-village/">Property Rehab &amp; Addition</a></h3>
@@ -292,7 +330,7 @@
             </div>
           </li>
           <li class="hub-card" data-reveal>
-            <img src="https://static.wixstatic.com/media/dc69ab_58a09638df8844398aef21b5015379da~mv2.png" alt="Full build in Fishtown" width="480" height="300" loading="lazy">
+            <img src="/Images/projects/custom-home-build-fishtown/street-view-completed-custom-home-build.jpg" alt="Full build in Fishtown" width="480" height="300" loading="lazy">
             <div class="hub-card-body">
               <span class="hub-card-tag">Nearby · Fishtown</span>
               <h3><a href="/projects/custom-home-build-fishtown/">Custom Home Build</a></h3>
@@ -301,7 +339,7 @@
             </div>
           </li>
           <li class="hub-card" data-reveal>
-            <img src="https://static.wixstatic.com/media/dc69ab_717fd78dc4a848d9b25c41d48cdb9158~mv2.jpg" alt="Custom white kitchen in Kensington" width="480" height="300" loading="lazy">
+            <img src="/Images/site/white-kitchen-waterfall-island-kensington.jpg" alt="Custom white kitchen in Kensington" width="480" height="300" loading="lazy">
             <div class="hub-card-body">
               <span class="hub-card-tag">Nearby · Kensington</span>
               <h3><a href="/projects/luxury-townhome-kensington/">Luxury Custom Townhome</a></h3>
@@ -427,7 +465,7 @@
           <!-- TODO: confirm ZIP and email on GBP match exactly -->
           <address class="footer-nap">
             <!-- TODO: confirm Paiz Builders HQ address, phone, and email — carried over from previous brand -->
-            Paiz Builders · 3146 Frankford Ave, Philadelphia, PA 19134 · <a href="tel:+12158884384">215-888-4384</a> · <a href="mailto:info@paizbuilders.com">info@paizbuilders.com</a>
+            Paiz Builders · 3146 Frankford Ave, Philadelphia, PA 19134 · <a href="tel:+12158884384">215-888-4384</a> · <a href="mailto:paizbuilders@gmail.com">paizbuilders@gmail.com</a>
           </address>
           <a class="btn btn-primary" href="/contact/">Get a Free Estimate</a>
         </div>
@@ -447,8 +485,8 @@
     "@type": "GeneralContractor",
     "name": "Paiz Builders",
     "telephone": "+1-215-888-4384",
-    "email": "info@paizbuilders.com",
-    "url": "https://paizbuilders.com/",
+    "email": "paizbuilders@gmail.com",
+    "url": "https://www.paizbuilders.com/",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "3146 Frankford Ave",
@@ -457,6 +495,8 @@
       "postalCode": "19134",
       "addressCountry": "US"
     },
+    "geo": { "@type": "GeoCoordinates", "latitude": 39.9928, "longitude": -75.1112 },
+    "hasMap": "https://www.google.com/maps?q=3146+Frankford+Ave,+Philadelphia,+PA+19134",
     "areaServed": [
       { "@type": "Place", "name": "Fishtown, Philadelphia" },
       { "@type": "Place", "name": "Northern Liberties, Philadelphia" },
