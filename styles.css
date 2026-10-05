@@ -3431,6 +3431,12 @@ body.overlay-header .lp-hero {
 .pj-grid li:nth-child(4) .pj-slide { animation-delay: 4.5s; }
 .pj-grid li:nth-child(4) .pj-slide:nth-child(2) { animation-delay: 8.5s; }
 .pj-grid li:nth-child(4) .pj-slide:nth-child(3) { animation-delay: 12.5s; }
+.pj-grid li:nth-child(5) .pj-slide { animation-delay: 2.25s; }
+.pj-grid li:nth-child(5) .pj-slide:nth-child(2) { animation-delay: 6.25s; }
+.pj-grid li:nth-child(5) .pj-slide:nth-child(3) { animation-delay: 10.25s; }
+.pj-grid li:nth-child(6) .pj-slide { animation-delay: 3.75s; }
+.pj-grid li:nth-child(6) .pj-slide:nth-child(2) { animation-delay: 7.75s; }
+.pj-grid li:nth-child(6) .pj-slide:nth-child(3) { animation-delay: 11.75s; }
 
 .pj-scrim {
   position: absolute;
@@ -5229,5 +5235,13 @@ body.overlay-header .logo-main,
     scroll-snap-type: none;
     padding-bottom: 0;
     will-change: transform;
+  }
+
+  /* While pinned, size each card to the space under the header + heading so
+     the whole card (including the service name at its base) stays on screen.
+     --svc-card-h is set by JS from the real viewport. */
+  .services.svc-sticky .service-card {
+    aspect-ratio: auto;
+    height: var(--svc-card-h, 62vh);
   }
 }

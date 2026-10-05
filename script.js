@@ -525,6 +525,15 @@
     section.style.height = '';
     var header = document.getElementById('site-header');
     var topOffset = header ? header.offsetHeight : 0;
+    // Fit the pinned cards to the viewport: header + section heading + card
+    // must all be visible, or the service name at the card's base is cut off.
+    var head = section.querySelector('.section-head');
+    var headH = head ? head.offsetHeight : 0;
+    var gap = 24;
+    var avail = window.innerHeight - topOffset - headH - gap * 2;
+    var cardW = row.firstElementChild ? row.firstElementChild.offsetWidth : 280;
+    var natural = Math.round(cardW * 5 / 3);
+    section.style.setProperty('--svc-card-h', Math.max(240, Math.min(natural, avail)) + 'px');
     dist = row.scrollWidth - row.clientWidth;
     if (dist <= 0) { deactivate(); return; }
     container.style.top = topOffset + 'px';
