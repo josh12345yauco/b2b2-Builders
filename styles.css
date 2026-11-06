@@ -5245,3 +5245,12 @@ body.overlay-header .logo-main,
     height: var(--svc-card-h, 62vh);
   }
 }
+
+/* ---------- Project index list (tools/add_project_index_lists.py) ---------- */
+.project-index { margin-top: clamp(32px, 4vw, 48px); padding-top: clamp(24px, 3vw, 32px); border-top: 1px solid var(--line); }
+.project-index .eyebrow { margin-bottom: 14px; }
+.pi-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0 32px; }
+.pi-list li { border-bottom: 1px solid var(--line); }
+.pi-list a { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; color: var(--ink); text-decoration: none; font-weight: 600; }
+.pi-list a:hover { color: var(--blue); }
+.pi-list .pi-area { flex-shrink: 0; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
